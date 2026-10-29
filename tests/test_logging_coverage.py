@@ -141,7 +141,9 @@ _SRC_ROOT = Path(__file__).resolve().parents[1] / "src" / "trcc"
 #: (src + tests + dev) since it was written; the module review
 #: (``dev/tools/review_module.py``) named it, holding the visualizer to a
 #: log line in every function.
-MAX_SILENT = 282
+#: 282 -> 281 on 2026-10-30: ``UCPreview.set_status`` logs the status it
+#: shows, touched to wrap a long file name or error.
+MAX_SILENT = 281
 
 
 def test_logging_coverage_only_improves() -> None:

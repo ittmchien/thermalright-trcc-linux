@@ -23,6 +23,10 @@ from .preview_popup import PreviewPopOut
 log = logging.getLogger(__name__)
 frame_log = per_frame(__name__)
 
+#: A zero-width space after each separator: a file name has no spaces, so
+#: without these a long one cannot wrap and runs off the panel's edge.
+_BREAK_AFTER = {ord(c): c + "​" for c in "_-./\\"}
+
 
 class UCPreview(BasePanel):
     """
@@ -98,6 +102,7 @@ class UCPreview(BasePanel):
         self.status_label = QLabel("Ready")
         self.status_label.setStyleSheet(Styles.STATUS_LABEL)
         self.status_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.status_label.setWordWrap(True)
         layout.addWidget(self.status_label)
 
         # Video progress bar container (hidden by default)
@@ -245,7 +250,8 @@ class UCPreview(BasePanel):
         self.preview_label.set_image(image, fast=fast)
 
     def set_status(self, text):
-        self.status_label.setText(text)
+        log.info("set_status: %s", text)
+        self.status_label.setText(text.translate(_BREAK_AFTER))
 
     def show_video_controls(self, show=True):
         self.progress_container.setVisible(show)
