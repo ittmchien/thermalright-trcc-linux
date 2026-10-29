@@ -232,8 +232,8 @@ class PawnioCpu(CpuSource):
             last = self._last_temp
             if (e.code == _BUS_BUSY and last is not None
                     and time.monotonic() - last[1] < HOLD_ON_BUSY_S):
-                frame_log.debug("PawnioCpu.temp: bus busy -- holding %.1f",
-                                last[0])
+                recurring_failure(log, "PawnioCpu.temp: bus busy -- holding "
+                                       "the last reading")
                 return last[0]
             recurring_failure(log, "PawnioCpu.temp: read failed")
             return None
