@@ -82,8 +82,8 @@ Log "7-Zip OK"
 # Download ffmpeg essentials (LGPL)
 # -----------------------------------------------------------------------
 Log "--- Downloading ffmpeg ---"
-if (Test-Path "ffmpeg.exe") {
-  Log "ffmpeg.exe already present - skipping download"
+if ((Test-Path "ffmpeg.exe") -and (Test-Path "ffprobe.exe")) {
+  Log "ffmpeg.exe + ffprobe.exe already present - skipping download"
 } else {
   try {
     Invoke-WebRequest -Uri "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip" -OutFile "ffmpeg.zip" -UseBasicParsing
@@ -91,6 +91,9 @@ if (Test-Path "ffmpeg.exe") {
     $ffmpegExe = Get-ChildItem -Path "ffmpeg-tmp" -Recurse -Filter "ffmpeg.exe" | Select-Object -First 1
     if (-not $ffmpegExe) { Die "ffmpeg.exe not found in archive" }
     Copy-Item $ffmpegExe.FullName -Destination "ffmpeg.exe" -Force
+    $ffprobeExe = Get-ChildItem -Path "ffmpeg-tmp" -Recurse -Filter "ffprobe.exe" | Select-Object -First 1
+    if (-not $ffprobeExe) { Die "ffprobe.exe not found in archive" }
+    Copy-Item $ffprobeExe.FullName -Destination "ffprobe.exe" -Force
     Remove-Item "ffmpeg.zip" -Force
     Remove-Item "ffmpeg-tmp" -Recurse -Force
     Log "ffmpeg downloaded OK"
@@ -183,7 +186,8 @@ Copy-Item "7z-standalone\7za.exe" "dist\trcc\7z.exe" -Force
 Copy-Item "7z-standalone\7za.dll" "dist\trcc\7z.dll" -Force
 Log "Bundled 7z.exe + 7z.dll"
 Copy-Item "ffmpeg.exe" "dist\trcc\ffmpeg.exe" -Force
-Log "Bundled ffmpeg.exe"
+Copy-Item "ffprobe.exe" "dist\trcc\ffprobe.exe" -Force
+Log "Bundled ffmpeg.exe + ffprobe.exe"
 if ($libusbPath -and (Test-Path $libusbPath)) {
   Copy-Item $libusbPath "dist\trcc\" -Force
   Log "Bundled libusb: $(Split-Path $libusbPath -Leaf)"
@@ -219,6 +223,7 @@ if (-not (Test-Path "dist\trcc\trcc-gui.exe")) { $missing += "trcc-gui.exe" }
 if (-not (Test-Path "dist\trcc\7z.exe"))       { $missing += "7z.exe" }
 if (-not (Test-Path "dist\trcc\7z.dll"))       { $missing += "7z.dll" }
 if (-not (Test-Path "dist\trcc\ffmpeg.exe"))   { $missing += "ffmpeg.exe" }
+if (-not (Test-Path "dist\trcc\ffprobe.exe"))  { $missing += "ffprobe.exe" }
 if (-not (Get-ChildItem "dist\trcc\libusb*" -ErrorAction SilentlyContinue)) {
   $missing += "libusb-1.0.dll"
 }

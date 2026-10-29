@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import logging
 import sys
+import time
 from collections.abc import Callable
 from contextlib import AbstractContextManager, nullcontext
 from pathlib import Path
@@ -54,6 +55,11 @@ MODULE_DIR_NAME = "pawnio"
 #: ``tests/test_pawnio.py`` holds windows.yml and build_windows.ps1 to it.
 BUNDLED_MODULES = ("IntelMSR.bin", "AMDFamily17.bin", "LpcIO.bin")
 _NOT_FOR_THIS_CPU = 50              # ERROR_NOT_SUPPORTED from a module's main()
+_BUS_BUSY = 0x102                   # WAIT_TIMEOUT: another monitor holds Access_PCI
+#: How long a busy bus may stand in the last good temperature.  Another
+#: monitor (GamePP's HwMonitor64, measured 2026-10-29) can hold Access_PCI
+#: on half of TRCC's ticks; without the hold the panel blinks "--".
+HOLD_ON_BUSY_S = 5.0
 
 
 def module_dir() -> Path:
@@ -157,6 +163,8 @@ class PawnioCpu(CpuSource):
         self._pci_bus = pci_bus
         self._package: _IntelPackage | _AmdPackage | None = None
         self._settled = False
+        #: The last good temperature and when it was read -- for a busy bus.
+        self._last_temp: tuple[float, float] | None = None
         #: Why there is no reading -- for ``trcc doctor``; empty when there is.
         self.reason = ""
 
@@ -219,10 +227,19 @@ class PawnioCpu(CpuSource):
         if package is None:
             return None
         try:
-            return package.temp()
-        except PawnIoError:
+            value = package.temp()
+        except PawnIoError as e:
+            last = self._last_temp
+            if (e.code == _BUS_BUSY and last is not None
+                    and time.monotonic() - last[1] < HOLD_ON_BUSY_S):
+                frame_log.debug("PawnioCpu.temp: bus busy -- holding %.1f",
+                                last[0])
+                return last[0]
             recurring_failure(log, "PawnioCpu.temp: read failed")
             return None
+        if value is not None:
+            self._last_temp = (value, time.monotonic())
+        return value
 
     def power(self) -> float | None:
         frame_log.debug("PawnioCpu.power")

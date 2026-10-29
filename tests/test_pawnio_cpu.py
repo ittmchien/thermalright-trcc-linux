@@ -154,6 +154,53 @@ def test_a_refused_read_is_no_reading_not_an_error() -> None:
     assert (cpu.temp(), cpu.power()) == (None, None)
 
 
+def _busy_bus_cpu(device: _FakePawnIo, busy: list[bool]) -> PawnioCpu:
+    """An AMD reader whose Access_PCI is held by another monitor while
+    ``busy[0]`` -- the WAIT_TIMEOUT PciBusLock.held raises."""
+
+    @contextmanager
+    def bus() -> Iterator[None]:
+        if busy[0]:
+            raise PawnIoError(0x102, "the PCI bus is busy -- another monitor "
+                                     "holds Global\\Access_PCI")
+        yield
+
+    return PawnioCpu(
+        open_module=lambda file: PawnIoModule(file.encode(), name=file,
+                                              device=device),
+        pci_bus=lambda: bus)
+
+
+def test_a_busy_bus_holds_the_last_temperature() -> None:
+    """GamePP's HwMonitor64 held Access_PCI on half of TRCC's ticks
+    (measured 2026-10-29); each miss blanked the panel's CPU temperature.
+
+    MUTATION CHECK: return None on a busy bus."""
+    busy = [False]
+    cpu = _busy_bus_cpu(_FakePawnIo("AMDFamily17.bin", RYZEN), busy)
+    assert cpu.temp() == 55.0
+    busy[0] = True
+    assert cpu.temp() == 55.0
+
+
+def test_a_busy_bus_holds_only_for_a_while(monkeypatch) -> None:
+    """MUTATION CHECK: hold the last temperature forever."""
+    from trcc.adapters.sensors import _pawnio_cpu
+    busy = [False]
+    cpu = _busy_bus_cpu(_FakePawnIo("AMDFamily17.bin", RYZEN), busy)
+    now = [1000.0]
+    monkeypatch.setattr(_pawnio_cpu.time, "monotonic", lambda: now[0])
+    assert cpu.temp() == 55.0
+    busy[0] = True
+    now[0] += _pawnio_cpu.HOLD_ON_BUSY_S + 0.1
+    assert cpu.temp() is None
+
+
+def test_a_busy_bus_before_any_reading_is_no_reading() -> None:
+    cpu = _busy_bus_cpu(_FakePawnIo("AMDFamily17.bin", RYZEN), [True])
+    assert cpu.temp() is None
+
+
 def test_a_module_whose_first_reads_fail_is_closed() -> None:
     """MUTATION CHECK: drop module.close() in PawnioCpu._reader."""
     device = _FakePawnIo("IntelMSR.bin", I9_12900K)

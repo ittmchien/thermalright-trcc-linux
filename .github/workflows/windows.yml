@@ -47,6 +47,10 @@ jobs:
           Expand-Archive ffmpeg.zip -DestinationPath ffmpeg-tmp
           $ffmpegExe = Get-ChildItem -Path ffmpeg-tmp -Recurse -Filter "ffmpeg.exe" | Select-Object -First 1
           Copy-Item $ffmpegExe.FullName -Destination ffmpeg.exe -Force
+          # ffprobe sizes a user's own video before it decodes; without it
+          # PlayVideo refuses every file from disk ("ffprobe failed").
+          $ffprobeExe = Get-ChildItem -Path ffmpeg-tmp -Recurse -Filter "ffprobe.exe" | Select-Object -First 1
+          Copy-Item $ffprobeExe.FullName -Destination ffprobe.exe -Force
 
       # Ensure libusb DLL is available (pyusb loads via ctypes, PyInstaller misses it)
       - name: Download libusb
@@ -121,6 +125,7 @@ jobs:
           Copy-Item -Path 7z-standalone/7za.dll -Destination dist/trcc/7z.dll -Force
           # Bundle ffmpeg for video playback (LGPL, like C# app)
           Copy-Item -Path ffmpeg.exe -Destination dist/trcc/ffmpeg.exe -Force
+          Copy-Item -Path ffprobe.exe -Destination dist/trcc/ffprobe.exe -Force
           # Bundle libusb (pyusb loads via ctypes, PyInstaller misses it)
           if ("${{ steps.libusb.outputs.LIBUSB_PATH }}") {
             Copy-Item -Path "${{ steps.libusb.outputs.LIBUSB_PATH }}" -Destination dist/trcc/ -Force
@@ -158,6 +163,7 @@ jobs:
           if (-not (Test-Path "dist/trcc/7z.exe")) { $missing += "7z.exe" }
           if (-not (Test-Path "dist/trcc/7z.dll")) { $missing += "7z.dll" }
           if (-not (Test-Path "dist/trcc/ffmpeg.exe")) { $missing += "ffmpeg.exe" }
+          if (-not (Test-Path "dist/trcc/ffprobe.exe")) { $missing += "ffprobe.exe" }
           $libusb = Get-ChildItem "dist/trcc/libusb*" -ErrorAction SilentlyContinue
           if (-not $libusb) { $missing += "libusb-1.0.dll" }
           foreach ($f in "IntelMSR.bin", "AMDFamily17.bin", "LpcIO.bin", "COPYING") {
