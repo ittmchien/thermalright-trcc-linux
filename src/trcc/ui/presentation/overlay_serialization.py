@@ -63,6 +63,7 @@ def entries_to_configs(
             id=e.id, x=e.x, y=e.y, color=e.color,
             font_name=e.font or THEME_FONT, font_size=e.size,
             font_style=1 if e.bold else 2 if e.italic else 0,
+            shadow=e.shadow,
         )
         match e.type, e.source:
             case "text", _:
@@ -103,6 +104,7 @@ def config_fields(cfg: OverlayElementConfig) -> dict[str, Any] | None:
         "x": cfg.x, "y": cfg.y, "color": cfg.color,
         "size": cfg.font_size, "font": cfg.font_name,
         "bold": cfg.font_style == 1, "italic": cfg.font_style == 2,
+        "shadow": cfg.shadow,
     }
     match cfg.mode:
         case OverlayMode.CUSTOM:

@@ -967,6 +967,9 @@ class OverlayElement:
     size: int = OVERLAY_DEFAULT_SIZE
     bold: bool = False
     italic: bool = False
+    # A dark drop shadow under the text, so it stays readable over a busy
+    # video.  TRCC's own; no DC field holds it, so a DC theme reads False.
+    shadow: bool = False
     # Font family.  Serialized as ``name`` -- the key both theme parsers
     # already write and the overlay serializer round-trips -- so a user-edited
     # element keeps the font instead of silently reverting to the theme
@@ -995,6 +998,9 @@ class OverlayElement:
             "color": self.color, "size": self.size,
             "bold": self.bold, "italic": self.italic,
         }
+        # Only when set, so a layout without shadows serializes as before.
+        if self.shadow:
+            out["shadow"] = True
         if self.font:
             out["name"] = self.font
         if self.type == "text":
@@ -1030,6 +1036,7 @@ class OverlayElement:
             size=int(data.get("size", 16)),
             bold=bool(data.get("bold", False)),
             italic=bool(data.get("italic", False)),
+            shadow=bool(data.get("shadow", False)),
             # Every shape this family can arrive in, resolved in ONE place --
             # see :func:`element_family`.  Gated by
             # ``test_overlay_font_family.py``.
@@ -2045,6 +2052,8 @@ class OverlayElementConfig:
     font_name: str = THEME_FONT
     font_size: int = 36
     font_style: int = 0
+    #: The element's drop shadow, carried so a gui edit never drops it.
+    shadow: bool = False
     text: str = ""
     #: The sensor a HARDWARE cell shows, when the DC pair table cannot name it
     #: (a board probe, a voltage, one DIMM) -- the pair is then (0, 0).

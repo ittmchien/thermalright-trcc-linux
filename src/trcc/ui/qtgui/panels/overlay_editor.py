@@ -199,6 +199,7 @@ class OverlayEditorPanel(BasePanel):
             font=values["font"],
             bold=values["bold"],
             italic=values["italic"],
+            shadow=values["shadow"],
             text=values["text"],
             metric=values["metric"],
             format=values["format"],
@@ -248,7 +249,8 @@ class OverlayEditorPanel(BasePanel):
             x=changed.get("x"), y=changed.get("y"),
             color=changed.get("color"), size=changed.get("size"),
             font=changed.get("font"), bold=changed.get("bold"),
-            italic=changed.get("italic"), text=changed.get("text"),
+            italic=changed.get("italic"), shadow=changed.get("shadow"),
+            text=changed.get("text"),
             metric=changed.get("metric"), format=changed.get("format"),
             show_unit=changed.get("show_unit"), source=changed.get("source"),
         ))
@@ -353,6 +355,8 @@ class _ElementDialog(QDialog):
         self._italic = QComboBox(self)
         self._italic.addItem("Roman", userData=False)
         self._italic.addItem("Italic", userData=True)
+        # A dark drop shadow under the text, for a busy background.
+        self._shadow = QCheckBox("Drop shadow", self)
 
         # Type-specific fields
         self._text = QLineEdit(self)
@@ -381,6 +385,7 @@ class _ElementDialog(QDialog):
         form.addRow("Font:", self._font)
         form.addRow("Weight:", self._bold)
         form.addRow("Slant:", self._italic)
+        form.addRow("", self._shadow)
         form.addRow("Text:", self._text)
         form.addRow("Metric id:", metric_row)
         form.addRow("Format string:", self._format)
@@ -426,6 +431,7 @@ class _ElementDialog(QDialog):
         self._font.setCurrentText(element.font)
         self._bold.setCurrentIndex(1 if element.bold else 0)
         self._italic.setCurrentIndex(1 if element.italic else 0)
+        self._shadow.setChecked(element.shadow)
         self._text.setText(element.text)
         self._metric.setText(element.metric)
         self._format.setText(element.format)
@@ -535,6 +541,7 @@ class _ElementDialog(QDialog):
             "font":    self._font.currentText().strip(),
             "bold":    bool(self._bold.currentData()),
             "italic":  bool(self._italic.currentData()),
+            "shadow":  bool(self._shadow.isChecked()),
             "text":    self._text.text(),
             "metric":  self._metric.text().strip(),
             "format":  self._format.text() or "{value}",

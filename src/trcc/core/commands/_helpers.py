@@ -605,7 +605,8 @@ def _element_to_entry(e: OverlayElement) -> OverlayElementEntry:
     log.debug("_element_to_entry: id=%s type=%s", e.id, e.type)
     return OverlayElementEntry(
         id=e.id, type=e.type, x=e.x, y=e.y, color=e.color, size=e.size,
-        font=e.font, bold=e.bold, italic=e.italic, text=e.text,
+        font=e.font, bold=e.bold, italic=e.italic, shadow=e.shadow,
+        text=e.text,
         metric=e.metric, format=e.format, show_unit=e.show_unit,
         source=e.source,
     )

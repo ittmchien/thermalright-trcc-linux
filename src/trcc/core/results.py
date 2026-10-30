@@ -1169,6 +1169,8 @@ class OverlayElementEntry:
     font: str = ""
     bold: bool = False
     italic: bool = False
+    #: A dark drop shadow under the text — see OverlayElement.shadow.
+    shadow: bool = False
     text: str = ""
     metric: str = ""
     format: str = OVERLAY_DEFAULT_FORMAT

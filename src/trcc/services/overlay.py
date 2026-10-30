@@ -25,6 +25,12 @@ from ._clock import clock_text
 log = logging.getLogger(__name__)
 frame_log = per_frame(__name__)
 
+#: An element's drop shadow (``OverlayElement.shadow``): black, offset
+#: down-right by size // SHADOW_OFFSET_DIVISOR px, never under the minimum.
+SHADOW_COLOR = "#000000"
+SHADOW_OFFSET_DIVISOR = 20
+SHADOW_MIN_OFFSET = 2
+
 
 
 # Unit suffixes stripped off a metric value before drawing — the Windows app
@@ -400,15 +406,7 @@ class OverlayService:
         y = int(element.get("y", 0))
         size = int(element.get("size", 16))
         frame_log.debug("draw_text %s: %r at (%d, %d) size=%d", source, text, x, y, size)
-        self._r.draw_text(
-            surface,
-            x=x, y=y, text=text,
-            color=str(element.get("color", "#ffffff")),
-            size=size,
-            bold=bool(element.get("bold", False)),
-            italic=bool(element.get("italic", False)),
-            family=element_family(element),
-        )
+        self._put_text(surface, element, x, y, text)
 
     def _draw_metric(
         self,
@@ -456,15 +454,7 @@ class OverlayService:
         y = int(element.get("y", 0))
         frame_log.debug("draw_metric %s: %s=%s at (%d, %d)",
                   source, metric_id, text, x, y)
-        self._r.draw_text(
-            surface,
-            x=x, y=y, text=text,
-            color=str(element.get("color", "#ffffff")),
-            size=int(element.get("size", 16)),
-            bold=bool(element.get("bold", False)),
-            italic=bool(element.get("italic", False)),
-            family=element_family(element),
-        )
+        self._put_text(surface, element, x, y, text)
 
     def _draw_clock(
         self,
@@ -490,12 +480,28 @@ class OverlayService:
         y = int(element.get("y", 0))
         frame_log.debug("draw_clock %s: %s=%r at (%d, %d)",
                   source, clock_source, text, x, y)
-        self._r.draw_text(
-            surface,
-            x=x, y=y, text=text,
-            color=str(element.get("color", "#ffffff")),
-            size=int(element.get("size", 16)),
-            bold=bool(element.get("bold", False)),
-            italic=bool(element.get("italic", False)),
-            family=element_family(element),
-        )
+        self._put_text(surface, element, x, y, text)
+
+    def _put_text(self, surface: Any, element: dict[str, Any],
+                  x: int, y: int, text: str) -> None:
+        """Draw *text* with *element*'s style -- its shadow first, when set.
+
+        One site for all three element kinds, so the shadow cannot reach one
+        kind and miss another.  The shadow is the same text in black, offset
+        down-right by a twentieth of the size (2 px at least), drawn beneath.
+        """
+        size = int(element.get("size", 16))
+        bold = bool(element.get("bold", False))
+        italic = bool(element.get("italic", False))
+        family = element_family(element)
+        has_shadow = bool(element.get("shadow", False))
+        frame_log.debug("_put_text: %r at (%d, %d) shadow=%s",
+                        text, x, y, has_shadow)
+        if has_shadow:
+            offset = max(SHADOW_MIN_OFFSET, size // SHADOW_OFFSET_DIVISOR)
+            self._r.draw_text(surface, x=x + offset, y=y + offset, text=text,
+                              color=SHADOW_COLOR, size=size, bold=bold,
+                              italic=italic, family=family)
+        self._r.draw_text(surface, x=x, y=y, text=text,
+                          color=str(element.get("color", "#ffffff")),
+                          size=size, bold=bold, italic=italic, family=family)

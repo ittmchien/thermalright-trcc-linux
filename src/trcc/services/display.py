@@ -1574,7 +1574,7 @@ class DisplayService:
         s = self._settings.for_device(info.key)
         user_sig = tuple(
             (e.id, e.type, e.x, e.y, e.color, e.size,
-             e.bold, e.italic, e.text, e.metric, e.format, e.source)
+             e.bold, e.italic, e.shadow, e.text, e.metric, e.format, e.source)
             for e in (s.user_overlay_elements or ())
         )
         # Temp unit participates in the key so toggling °C ↔ °F via

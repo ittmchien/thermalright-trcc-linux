@@ -3063,6 +3063,8 @@ class AddOverlayElement(Command[OverlayElementResult]):
     font: str = ""
     bold: bool = False
     italic: bool = False
+    #: A dark drop shadow under the text (OverlayElement.shadow).
+    shadow: bool = False
     text: str = ""
     metric: str = ""
     format: str = OVERLAY_DEFAULT_FORMAT
@@ -3104,6 +3106,7 @@ class AddOverlayElement(Command[OverlayElementResult]):
             id=eid, type=self.type,
             x=self.x, y=self.y, color=self.color, size=self.size,
             font=self.font, bold=self.bold, italic=self.italic,
+            shadow=self.shadow,
             text=self.text,
             metric=self.metric, format=self.format,
             show_unit=self.show_unit,
@@ -3130,6 +3133,8 @@ class UpdateOverlayElement(Command[OverlayElementResult]):
     font: str | None = None
     bold: bool | None = None
     italic: bool | None = None
+    #: None leaves the element's drop shadow as it is.
+    shadow: bool | None = None
     text: str | None = None
     metric: str | None = None
     format: str | None = None
@@ -3151,6 +3156,7 @@ class UpdateOverlayElement(Command[OverlayElementResult]):
                 self.key, self.element_id,
                 x=self.x, y=self.y, color=self.color, size=self.size,
                 font=self.font, bold=self.bold, italic=self.italic,
+                shadow=self.shadow,
                 text=self.text,
                 metric=self.metric, format=self.format,
                 show_unit=self.show_unit, source=self.source,

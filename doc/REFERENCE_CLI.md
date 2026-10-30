@@ -699,6 +699,7 @@ trcc display overlay-add [OPTIONS] KEY TYPE_
 | `--font` `FONT` | Font family, e.g. 'Microsoft YaHei' (list them with `trcc system list-fonts`); empty keeps the theme default |
 | `--bold` | -- |
 | `--italic` | -- |
+| `--shadow` | Draw a dark drop shadow under the text, for a busy background |
 | `--show-unit` | Draw the metric's unit (°C/%/MHz/RPM) after the number, or the bare number when the unit is baked into the theme art |
 | `--id` `ELEMENT_ID` | Explicit element id (default: auto-generated UUID) |
 
@@ -784,6 +785,7 @@ trcc display overlay-update [OPTIONS] KEY ELEMENT_ID
 | `--source` `SOURCE` | -- |
 | `--bold` | -- |
 | `--italic` | -- |
+| `--shadow` | Draw a dark drop shadow under the text, or remove it |
 | `--show-unit` | Draw the metric's unit (°C/%/MHz/RPM) after the number, or the bare number when the unit is baked into the theme art |
 
 ### `trcc display pause-video`

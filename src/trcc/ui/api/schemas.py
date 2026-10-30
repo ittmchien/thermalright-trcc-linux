@@ -305,6 +305,8 @@ class OverlayElementSchema(BaseModel):
     font: str = ""
     bold: bool = False
     italic: bool = False
+    #: A dark drop shadow under the text (OverlayElement.shadow).
+    shadow: bool = False
     text: str = ""
     metric: str = ""
     format: str = OVERLAY_DEFAULT_FORMAT
@@ -322,6 +324,8 @@ class OverlayElementAddRequest(BaseModel):
     font: str = ""
     bold: bool = False
     italic: bool = False
+    #: A dark drop shadow under the text (OverlayElement.shadow).
+    shadow: bool = False
     text: str = ""
     metric: str = ""
     format: str = OVERLAY_DEFAULT_FORMAT
@@ -339,6 +343,8 @@ class OverlayElementUpdateRequest(BaseModel):
     font: str | None = None
     bold: bool | None = None
     italic: bool | None = None
+    #: ``None`` leaves the element's drop shadow as it is.
+    shadow: bool | None = None
     text: str | None = None
     metric: str | None = None
     format: str | None = None

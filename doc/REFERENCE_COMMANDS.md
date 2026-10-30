@@ -46,6 +46,7 @@ Add a user-edited element to a device's overlay layer.
 | `font` | `str` | no |
 | `bold` | `bool` | no |
 | `italic` | `bool` | no |
+| `shadow` | `bool` | no |
 | `text` | `str` | no |
 | `metric` | `str` | no |
 | `format` | `str` | no |
@@ -650,6 +651,7 @@ Mutate fields on an existing user-edited overlay element.
 | `font` | `str | None` | no |
 | `bold` | `bool | None` | no |
 | `italic` | `bool | None` | no |
+| `shadow` | `bool | None` | no |
 | `text` | `str | None` | no |
 | `metric` | `str | None` | no |
 | `format` | `str | None` | no |
