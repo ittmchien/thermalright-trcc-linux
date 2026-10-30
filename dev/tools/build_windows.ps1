@@ -236,7 +236,7 @@ if ($missing.Count -gt 0) {
 }
 
 $ver = python -c "from trcc.__version__ import __version__; print(__version__)" 2>&1
-Log "PASSED - trcc.exe, trcc-gui.exe, 7z.exe, ffmpeg.exe, libusb, PawnIO OK"
+Log "PASSED - trcc.exe, trcc-gui.exe, 7z.exe, ffmpeg.exe, ffprobe.exe, libusb, PawnIO OK"
 Log "Version: $ver"
 
 if ($Installer) {

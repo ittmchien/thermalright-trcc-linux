@@ -263,6 +263,11 @@ class PawnIoModule:
         self.close()
 
 
+#: WaitForSingleObject's WAIT_TIMEOUT -- also the code of the PawnIoError a
+#: busy bus raises, which readers key on (``_pawnio_cpu``'s busy-bus hold).
+WAIT_TIMEOUT = 0x102
+
+
 class _BusLock:
     """A named mutex monitoring tools hold around one bus, so two of them never
     interleave an index/data pair on it.  LibreHardwareMonitor, HWiNFO and
@@ -272,7 +277,7 @@ class _BusLock:
     NAME: ClassVar[str]
     WAIT_MS: ClassVar[int]
     BUS: ClassVar[str]
-    _WAIT_TIMEOUT = 0x102
+    _WAIT_TIMEOUT = WAIT_TIMEOUT
 
     _k32: Any                       # set in __init__ behind a sys.platform gate
     _handle: Any

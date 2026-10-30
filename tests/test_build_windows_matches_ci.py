@@ -45,6 +45,18 @@ def test_the_local_build_runs_pyinstaller_as_ci_does() -> None:
     assert local == ci
 
 
+def test_both_builds_bundle_and_check_ffprobe() -> None:
+    """PlayVideo sizes a user's own video with ffprobe; a build that shipped
+    only ffmpeg refused every video from disk (2026-10-29).
+
+    MUTATION CHECK: drop the ffprobe copy or its check from either file."""
+    for path in (_CI, _LOCAL):
+        lines = path.read_text(encoding="utf-8").replace("\\", "/").splitlines()
+        bundled = [line for line in lines if "dist/trcc/ffprobe.exe" in line]
+        assert any("Copy-Item" in line for line in bundled), path.name
+        assert any("Test-Path" in line for line in bundled), path.name
+
+
 def test_neither_build_asks_for_elevation() -> None:
     """TRCC's service does what needed admin; an elevated exe would bring
     back the UAC prompt at every launch and the sign-in task that came with

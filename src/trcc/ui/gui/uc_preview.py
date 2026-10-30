@@ -25,7 +25,7 @@ frame_log = per_frame(__name__)
 
 #: A zero-width space after each separator: a file name has no spaces, so
 #: without these a long one cannot wrap and runs off the panel's edge.
-_BREAK_AFTER = {ord(c): c + "​" for c in "_-./\\"}
+_BREAK_AFTER = {ord(c): c + "\u200b" for c in "_-./\\"}
 
 
 class UCPreview(BasePanel):
@@ -101,8 +101,16 @@ class UCPreview(BasePanel):
         # Status label
         self.status_label = QLabel("Ready")
         self.status_label.setStyleSheet(Styles.STATUS_LABEL)
-        self.status_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        # Top-aligned so a status capped at two lines clips only its tail,
+        # not half of its first and last line.
+        self.status_label.setAlignment(
+            Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop)
         self.status_label.setWordWrap(True)
+        # Two lines at most: the panel is a fixed 560 px, so a third would
+        # push the video controls off its bottom; the full text is the tooltip.
+        self.status_label.ensurePolished()
+        self.status_label.setMaximumHeight(
+            self.status_label.fontMetrics().lineSpacing() * 2)
         layout.addWidget(self.status_label)
 
         # Video progress bar container (hidden by default)
@@ -249,9 +257,10 @@ class UCPreview(BasePanel):
                       iw, ih, self.preview_label._width, self.preview_label._height)
         self.preview_label.set_image(image, fast=fast)
 
-    def set_status(self, text):
-        log.info("set_status: %s", text)
+    def set_status(self, text: str) -> None:
+        log.info("set_status: %r -> %r", self.status_label.toolTip(), text)
         self.status_label.setText(text.translate(_BREAK_AFTER))
+        self.status_label.setToolTip(text)
 
     def show_video_controls(self, show=True):
         self.progress_container.setVisible(show)

@@ -43,7 +43,7 @@ from ._cpu_registers import (
     intel_package_temp,
     intel_tjmax,
 )
-from ._pawnio import PawnIoError, PawnIoModule, PciBusLock
+from ._pawnio import WAIT_TIMEOUT, PawnIoError, PawnIoModule, PciBusLock
 
 log = logging.getLogger(__name__)
 frame_log = per_frame(__name__)
@@ -55,7 +55,6 @@ MODULE_DIR_NAME = "pawnio"
 #: ``tests/test_pawnio.py`` holds windows.yml and build_windows.ps1 to it.
 BUNDLED_MODULES = ("IntelMSR.bin", "AMDFamily17.bin", "LpcIO.bin")
 _NOT_FOR_THIS_CPU = 50              # ERROR_NOT_SUPPORTED from a module's main()
-_BUS_BUSY = 0x102                   # WAIT_TIMEOUT: another monitor holds Access_PCI
 #: How long a busy bus may stand in the last good temperature.  Another
 #: monitor (GamePP's HwMonitor64, measured 2026-10-29) can hold Access_PCI
 #: on half of TRCC's ticks; without the hold the panel blinks "--".
@@ -230,12 +229,15 @@ class PawnioCpu(CpuSource):
             value = package.temp()
         except PawnIoError as e:
             last = self._last_temp
-            if (e.code == _BUS_BUSY and last is not None
-                    and time.monotonic() - last[1] < HOLD_ON_BUSY_S):
+            if e.code != WAIT_TIMEOUT:
+                recurring_failure(log, "PawnioCpu.temp: read failed")
+                return None
+            if last is not None and time.monotonic() - last[1] < HOLD_ON_BUSY_S:
                 recurring_failure(log, "PawnioCpu.temp: bus busy -- holding "
                                        "the last reading")
                 return last[0]
-            recurring_failure(log, "PawnioCpu.temp: read failed")
+            # Distinct from a driver failure, so a report can tell them apart.
+            recurring_failure(log, "PawnioCpu.temp: bus busy past the hold")
             return None
         if value is not None:
             self._last_temp = (value, time.monotonic())
