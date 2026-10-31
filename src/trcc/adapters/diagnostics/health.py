@@ -28,6 +28,7 @@ from pathlib import Path
 
 from ...core import toolchain
 from ...core.diagnostics import HealthCheckResult, HealthReport, Severity
+from ...core.models import SUBPROCESS_NO_WINDOW
 from ...core.ports import Paths, Platform
 from ..sensors._pawnio_cpu import PawnioCpu
 from ..sensors.nvml import NVML_RELOAD_HINT, GpuStateFn, nvml_init_state
@@ -749,9 +750,10 @@ def quick_subprocess(cmd: list[str], timeout_s: float = 2.0) -> str:
     """
     log.debug("quick_subprocess: cmd=%s timeout=%s", cmd, timeout_s)
     try:
+        # No console window per version probe on Windows.
         proc = subprocess.run(
             cmd, capture_output=True, text=True, timeout=timeout_s,
-            check=False,
+            check=False, creationflags=SUBPROCESS_NO_WINDOW,
         )
     except (FileNotFoundError, subprocess.SubprocessError, OSError):
         return ""

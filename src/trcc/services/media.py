@@ -28,7 +28,7 @@ from ..core import toolchain
 from ..core.errors import ThemeError
 from ..core.geometry import largest_fit_size
 from ..core.logs import per_frame
-from ..core.models import ZT_MAGIC
+from ..core.models import SUBPROCESS_NO_WINDOW, ZT_MAGIC
 from ..core.ports import FrameSource
 from .media_stream import StreamReader, _drain
 
@@ -227,8 +227,10 @@ class BackgroundDecode:
         self._done = threading.Event()
         self._grew = threading.Condition()
         self._began = time.monotonic()
+        # No console window per decode on Windows (a playlist starts one per video).
         self._proc: Any = subprocess.Popen(cmd, stdin=subprocess.DEVNULL,
-                                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                                           stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                           creationflags=SUBPROCESS_NO_WINDOW)
         self._tail: deque[bytes] = deque(maxlen=3)
         self._drain = threading.Thread(target=_drain, args=(self._proc.stderr, self._tail),
                                        daemon=True, name="trcc-decode-stderr")
@@ -399,7 +401,9 @@ def _probe_video_duration(path: Path) -> float | None:
     cmd = [toolchain.executable("ffprobe"), "-v", "error",
            "-show_entries", "format=duration", "-of", "csv=p=0", str(path)]
     try:
-        out = subprocess.check_output(cmd, stderr=subprocess.DEVNULL, timeout=10)
+        # No console window per probe on Windows.
+        out = subprocess.check_output(cmd, stderr=subprocess.DEVNULL, timeout=10,
+                                      creationflags=SUBPROCESS_NO_WINDOW)
         duration = float(out.decode("utf-8", errors="replace").strip())
     except (subprocess.CalledProcessError, subprocess.TimeoutExpired, OSError,
             ValueError) as e:
@@ -428,8 +432,10 @@ def _probe_video_size(path: Path) -> tuple[int, int] | None:
         str(path),
     ]
     try:
+        # No console window per probe on Windows.
         out = subprocess.check_output(
             cmd, stderr=subprocess.DEVNULL, timeout=10,
+            creationflags=SUBPROCESS_NO_WINDOW,
         ).decode("utf-8", errors="replace").strip()
     except (subprocess.CalledProcessError, subprocess.TimeoutExpired,
             FileNotFoundError, OSError) as e:

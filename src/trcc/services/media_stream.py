@@ -26,7 +26,7 @@ from typing import IO
 
 from ..core import toolchain
 from ..core.logs import per_frame
-from ..core.models import RawFrame
+from ..core.models import SUBPROCESS_NO_WINDOW, RawFrame
 from ..core.ports import CaptureNotReady
 
 log = logging.getLogger(__name__)
@@ -119,9 +119,11 @@ class StreamReader:
         w, h = self._size
         frame_bytes = w * h * 3
         frames = 0
+        # No console window for the stream's ffmpeg on Windows.
         self._proc = proc = subprocess.Popen(
             self._command(), stdin=subprocess.DEVNULL,
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            creationflags=SUBPROCESS_NO_WINDOW)
         assert proc.stdout is not None and proc.stderr is not None
         tail: deque[bytes] = deque(maxlen=3)
         drain = threading.Thread(target=_drain, args=(proc.stderr, tail),
