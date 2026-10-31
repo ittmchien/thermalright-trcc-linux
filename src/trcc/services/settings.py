@@ -1147,6 +1147,29 @@ class Settings:
                 s.slideshow_interval_s = max(1.0, float(interval_s))
             self._save()
 
+    # ── Video folder playlist ─────────────────────────────────────────
+
+    def set_video_folder(
+        self,
+        key: str,
+        *,
+        enabled: bool,
+        folder: str | None = None,
+        shuffle: bool | None = None,
+    ) -> None:
+        """Switch the video folder playlist; *folder* / *shuffle* change only
+        when given (``None`` keeps the saved value)."""
+        log.info("set_video_folder: key=%s enabled=%s folder=%s shuffle=%s",
+                 key, enabled, folder, shuffle)
+        with self._lock:
+            s = self.for_device(key)
+            s.video_folder_enabled = enabled
+            if folder is not None:
+                s.video_folder_path = folder
+            if shuffle is not None:
+                s.video_folder_shuffle = shuffle
+            self._save()
+
     # ── Persistence ───────────────────────────────────────────────────
 
     def _config_path(self) -> Path:

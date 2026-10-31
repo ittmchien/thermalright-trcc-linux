@@ -854,6 +854,11 @@ class LcdSnapshotResult(Result):
     #: takes the panel (the C#'s isGame / myCPU).
     game_enabled: bool = False
     game_threshold: int = 75
+    #: Video folder playlist: whether it plays, from which folder, and
+    #: whether in random order -- so every UI shows the App's saved state.
+    video_folder_enabled: bool = False
+    video_folder_path: str | None = None
+    video_folder_shuffle: bool = False
 
 
 @dataclass(frozen=True, slots=True)
@@ -1464,6 +1469,21 @@ class SlideshowAdvanceResult(Result):
     # The distinction lived only in ``message`` at first, which is the same
     # string-matching this codebase rejects for ``connected``.
     running: bool = False
+
+
+# Video folder playlist -- what is configured, and how many videos it found.
+@dataclass(frozen=True, slots=True)
+class VideoFolderResult(Result):
+    """A device's video folder playlist as saved: on/off, folder, order.
+
+    ``video_count`` is how many videos the folder held when the Command ran
+    (0 when it was switched off, or the folder had none).
+    """
+    key: str = ""
+    enabled: bool = False
+    folder: str | None = None
+    shuffle: bool = False
+    video_count: int = 0
 
 
 @dataclass(frozen=True, slots=True)

@@ -48,6 +48,7 @@ from trcc.core.commands import (
     SetScreencastRegion,
     SetSlideshow,
     SetSplitMode,
+    SetVideoFolder,
     SleepDevice,
     StartScreencast,
     StopScreencast,
@@ -929,6 +930,35 @@ def configure_slideshow(
         typer.echo(f"  {t}")
     if not result.ok:
         raise typer.Exit(code=1)
+
+
+# Feature: video folder playlist -- one Command; the App plays the folder.
+@app.command("video-folder")
+def video_folder(
+    key: DeviceKey,
+    folder: Path | None = typer.Argument(
+        None, help="Folder whose videos play one after another (omit to "
+                   "resume the saved folder)",
+        exists=True, file_okay=False, dir_okay=True,
+    ),
+    shuffle: bool | None = typer.Option(
+        None, "--shuffle/--no-shuffle",
+        help="Random order, each video once per round (default: unchanged)",
+    ),
+    off: bool = typer.Option(
+        False, "--off", help="Stop the playlist; the video showing keeps playing",
+    ),
+) -> None:
+    """Play the videos in a folder one after another, in order or shuffled.
+
+    The App plays the playlist, so it keeps going after this command exits
+    while the App runs.  Picking another theme or background from any UI
+    ends it.
+    """
+    log.info("cli display video-folder: key=%s folder=%s shuffle=%s off=%s",
+             key, folder, shuffle, off)
+    dispatch_echo(SetVideoFolder(key=key, enabled=not off, folder=folder,
+                                 shuffle=shuffle))
 
 
 @app.command("keepalive")

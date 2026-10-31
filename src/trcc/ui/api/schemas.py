@@ -412,6 +412,15 @@ class SlideshowConfigureRequest(BaseModel):
     interval_s: float | None = Field(None, ge=1.0)
 
 
+class VideoFolderRequest(BaseModel):
+    """Video folder playlist (feature).  ``folder`` must be inside TRCC's
+    data folders, like every path the API reads; ``None`` with ``folder`` /
+    ``shuffle`` keeps the saved value."""
+    enabled: bool = True
+    folder: str | None = None
+    shuffle: bool | None = None
+
+
 class KeepaliveRequest(BaseModel):
     """Keepalive-loop parameters.
 

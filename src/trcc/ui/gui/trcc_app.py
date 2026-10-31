@@ -590,7 +590,8 @@ class TRCCApp(QMainWindow):
         the labels made by ``_create_i18n_overlays`` (``_i18n_labels`` -- theme,
         mask, background, video and settings panels), the panel-table titles
         (``_i18n_panel_tables``), and the LED panel, which translates its own
-        texts (``set_language``).  Nothing else in ``ui/gui`` calls ``tr``.
+        texts (``set_language``) -- plus the video folder button's menu
+        (``_translate_video_folder``).  Nothing else in ``ui/gui`` calls ``tr``.
         """
         from ...core.i18n import tr
         log.info("_show_language: %s", lang)
@@ -602,6 +603,7 @@ class TRCCApp(QMainWindow):
                 label.setText(tr(key, lang, module))
         for panel, key in self._i18n_panel_tables:
             panel.set_title(tr(key, lang))
+        self._translate_video_folder(lang)
         self.uc_led_control.set_language(lang)
         for key, page in self._module_pages.items():
             cast(ModulePage, page).set_language(lang)
@@ -611,6 +613,14 @@ class TRCCApp(QMainWindow):
             self._translate_view(key, view, lang)
         self.uc_modules.view.set_language(lang)
         self.uc_theme_setting.overlay_grid.set_language(lang)
+
+    def _translate_video_folder(self, lang: str) -> None:
+        """The video folder button's words in *lang* -- at boot and on every
+        language change (feature: video folder playlist)."""
+        from ...core.i18n import tr
+        log.info("_translate_video_folder: %s", lang)
+        self.uc_theme_local.video_folder.set_texts(
+            tr("Video folder", lang), tr("Random", lang), tr("Stop", lang))
 
     def _on_bus_slideshow_changed(self, event: SlideshowChanged) -> None:
         """Route a ``SlideshowChanged`` event to its LCD's handler."""
@@ -1551,6 +1561,7 @@ class TRCCApp(QMainWindow):
         x, y, w, h, pt = LOCAL_GAME_CPU_POS
         _lbl(self.uc_theme_local, LOCAL_GAME_CPU_TEXT, x, y, w, h, pt,
              color='#b3b3b3')
+        self._translate_video_folder(lang)
 
         x, y, w, h, pt = ONLINE_THEME_POS
         _lbl(self.uc_theme_mask, tr('Cloud Masks', lang), x, y, w, h, pt, 'Cloud Masks')
@@ -1728,6 +1739,9 @@ class TRCCApp(QMainWindow):
         self.uc_theme_local.delete_requested.connect(self._on_delete_theme)
         self.uc_theme_local.export_requested.connect(self._on_export_clicked)
         self.uc_theme_local.import_requested.connect(self._on_import_clicked)
+        # Feature: video folder playlist -- the window opens the folder dialog.
+        self.uc_theme_local.video_folder_requested.connect(
+            self._on_video_folder_requested)
         self.uc_theme_local.delegate.connect(self._on_local_delegate)
         self.uc_theme_web.theme_selected.connect(self._on_cloud_theme_clicked)
         self.uc_theme_web.download_started.connect(self._on_theme_download_started)
@@ -1939,6 +1953,28 @@ class TRCCApp(QMainWindow):
             h = self._active_lcd()
             if h:
                 h.on_game_mode_delegate(data)
+        elif cmd == UCThemeLocal.CMD_VIDEO_FOLDER:
+            # Feature: video folder playlist -- Random / Stop from its menu.
+            h = self._active_lcd()
+            if h:
+                h.on_video_folder_delegate(data)
+
+    def _on_video_folder_requested(self) -> None:
+        """The video folder button's folder item: pick a folder, then the
+        active panel plays it (feature: video folder playlist)."""
+        from ...core.i18n import tr
+        h = self._active_lcd()
+        log.info("_on_video_folder_requested: device=%s",
+                 h.device_key if h else None)
+        if h is None:
+            return
+        # Opens at the folder the App has saved (shown on the button), if any.
+        folder = QFileDialog.getExistingDirectory(
+            self, tr("Video folder", self._lang_combo.currentData() or "en"),
+            self.uc_theme_local.video_folder.folder or "")
+        if folder:
+            h.on_video_folder_delegate(
+                {"enabled": True, "folder": folder, "shuffle": None})
 
     def _on_export_clicked(self) -> None:
         """The C#'s export: a ``.tr`` named after the theme-name box

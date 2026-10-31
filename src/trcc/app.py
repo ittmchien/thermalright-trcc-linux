@@ -119,6 +119,7 @@ from .services.reconnect_watcher import ReconnectWatcher
 from .services.settings import Settings
 from .services.slideshow import SlideshowService
 from .services.update_watch import UpdateWatch
+from .services.video_folder import VideoFolderService
 from .services.video_loop import VideoLoop
 
 log = logging.getLogger(__name__)
@@ -272,6 +273,9 @@ class App(CommandBus, ModuleServices):
         self.video_export_runner: VideoExportRunner = video_export_runner
         # Per-device slideshow cursor — tick-driven, no background thread.
         self.slideshow = SlideshowService()
+        # Per-device video folder playlist cursor (feature: video folder
+        # playlist) — VideoFolderDriver asks it which video plays next.
+        self.video_folder = VideoFolderService()
         # ONE microphone for the whole box, so one capture serves however many
         # panels are casting with audio.  Owned here rather than by the window
         # because the spectrum is drawn into the WIRE frame now: it belonged to
@@ -1415,6 +1419,7 @@ class App(CommandBus, ModuleServices):
         self.media.unload(key)
         self.backgrounds.clear(key)
         self.slideshow.reset(key)
+        self.video_folder.reset(key)   # feature: video folder playlist
         if self._display is not None:
             self._display.invalidate(key)
 
@@ -1710,10 +1715,13 @@ class App(CommandBus, ModuleServices):
         from .services.screencast_driver import task_key as screencast_task
         from .services.slideshow_driver import task_key as slideshow_task
         from .services.stream_driver import task_key as stream_task
+        from .services.video_folder_driver import task_key as video_folder_task
 
         log.info("stop_sources: %s", key)
         self._send_scheduler.remove(screencast_task(key))
         self._send_scheduler.remove(slideshow_task(key))
+        # Feature: video folder playlist -- its driver goes with the panel.
+        self._send_scheduler.remove(video_folder_task(key))
         self._send_scheduler.remove(stream_task(key))
         self._send_scheduler.remove(game_task(key))
         self.game_gates.pop(key, None)

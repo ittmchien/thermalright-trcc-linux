@@ -4,7 +4,7 @@
 
 A REST interface to the same command bus every other UI uses. Each endpoint builds a Command, dispatches it, and returns the Result as JSON — so anything here is also reachable from the CLI, the GUI, or your own client. The Commands themselves are documented in [`REFERENCE_COMMANDS.md`](REFERENCE_COMMANDS.md).
 
-**157 endpoints.**
+**158 endpoints.**
 
 ## Running it
 
@@ -83,6 +83,7 @@ Interactive docs are served at `/docs` while the API is running.
 | `POST /devices/{key}/display/theme` | `ThemeResponse` | — |
 | `POST /devices/{key}/display/tick` | `RenderResult` | Render the active theme with live sensors + send one frame. |
 | `POST /devices/{key}/display/upload-mask` | `MaskUploadResult` | Upload a mask file (server-side path) + apply it. |
+| `POST /devices/{key}/display/video-folder` | `VideoFolderResult` | Play the videos in a folder one after another -- or stop (enabled=false). |
 | `GET /devices/{key}/display/video-status` | `VideoStatusResponse` | Current playback state for the device's video background override. |
 | `POST /devices/{key}/display/visual` | `VisualResult` | Draw *key*'s background from what is playing with an audio visual -- or stop it ('' as the visual).  The preset is checked by the visual, which refuses one outside the visuals' folder. |
 | `POST /devices/{key}/display/visual/settings` | `VisualResult` | Move *key*'s playing audio visual's sliders -- live. |

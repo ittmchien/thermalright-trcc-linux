@@ -19,14 +19,14 @@ from typing import Any
 
 from PySide6.QtCore import Qt, Signal, SignalInstance
 from PySide6.QtGui import QIcon, QIntValidator
-from PySide6.QtWidgets import QLabel, QLineEdit, QPushButton
+from PySide6.QtWidgets import QLabel, QLineEdit, QMenu, QPushButton
 
 from ...core.models import LocalThemeItem
 from ...core.results import ThemeListEntry
 from ..presentation.slideshow_model import SlideshowModel
 from .assets import Assets
 from .base import BaseThemeBrowser, BaseThumbnail
-from .constants import Layout, Styles
+from .constants import Colors, Layout, Styles
 
 log = logging.getLogger(__name__)
 
@@ -137,6 +137,9 @@ class UCThemeLocal(BaseThemeBrowser):
     #: The C#'s delegate code for both game-mode controls (UCThemeLocal.cs:627,
     #: :726); here it carries the one half that changed.
     CMD_GAME_MODE = 64
+    #: Feature: video folder playlist (no C# counterpart) -- carries the
+    #: ``SetVideoFolder`` fields that changed.
+    CMD_VIDEO_FOLDER = 80
 
     slideshow_changed = Signal(bool, int, list)  # enabled, interval, theme_indices
     delete_requested = Signal(object)  # LocalThemeItem
@@ -144,6 +147,8 @@ class UCThemeLocal(BaseThemeBrowser):
     # the window owns the file dialogs and the device the theme goes to.
     export_requested = Signal()
     import_requested = Signal()
+    # Feature: video folder playlist -- the window owns the folder dialog too.
+    video_folder_requested = Signal()
 
     def __init__(self, parent=None):
         # Slideshow interaction state lives in a toolkit-free model; this
@@ -205,6 +210,7 @@ class UCThemeLocal(BaseThemeBrowser):
             482, 'app_import.png', "Import a theme", self.import_requested)
 
         self.game = GameModeControls(self)
+        self.video_folder = VideoFolderControls(self)
 
     def _icon_button(self, x: int, image: str, tip: str,
                      signal: SignalInstance | Callable[..., Any]) -> QPushButton:
@@ -227,6 +233,14 @@ class UCThemeLocal(BaseThemeBrowser):
         """Show the App's game mode on the panel's two controls -- READ only."""
         log.debug("UCThemeLocal.show_game_mode: %s/%d", enabled, threshold)
         self.game.show(enabled, threshold)
+
+    def show_video_folder(self, enabled: bool, folder: str | None,
+                          shuffle: bool) -> None:
+        """Show the App's video folder playlist -- READ only (feature:
+        video folder playlist)."""
+        log.debug("UCThemeLocal.show_video_folder: %s %s shuffle=%s",
+                  enabled, folder, shuffle)
+        self.video_folder.show(enabled, folder, shuffle)
 
     def _create_thumbnail(self, item_info: LocalThemeItem) -> ThemeThumbnail:
         return ThemeThumbnail(item_info)
@@ -483,4 +497,103 @@ class GameModeControls:
             self.button.setIcon(QIcon(px))
         if not self.cpu_input.hasFocus():
             self.cpu_input.setText(str(threshold))
+
+
+# Feature: video folder playlist -- a text button whose menu-indicator is
+# hidden (the 74 px span holds the label alone); an accent border while on.
+_VIDEO_FOLDER_STYLE = Styles.TEXT_BUTTON + (
+    "QPushButton { padding: 0px 4px; }"
+    "QPushButton::menu-indicator { image: none; width: 0px; }"
+)
+_VIDEO_FOLDER_ON_STYLE = (
+    f"QPushButton {{ border-color: {Colors.ACCENT_BORDER}; color: white; }}"
+)
+
+
+class VideoFolderControls:
+    """The video folder playlist's button on the local-theme panel.
+
+    Feature: video folder playlist -- no C# counterpart.  One text button in
+    the header row's free span, between the CPU box (336, 24 wide) and Export
+    (441); its menu picks a folder (the window opens the dialog), switches
+    Random, and stops.  Like :class:`GameModeControls` it never changes its
+    own look: ``show`` puts the App's saved state on it, from ``LcdSnapshot``.
+    """
+
+    #: x, y, w, h on the header row (y=28, 18 high, like the icon buttons).
+    GEOMETRY = (364, 28, 74, 18)
+
+    def __init__(self, panel: UCThemeLocal) -> None:
+        log.debug("VideoFolderControls.__init__: panel=%s", type(panel).__name__)
+        self._panel = panel
+        self.enabled = False
+        self.folder: str | None = None
+        self.shuffle = False
+        # English until the window translates (``set_texts``).
+        self._title = "Video folder"
+        self.button = QPushButton(self._title, panel)
+        self.button.setGeometry(*self.GEOMETRY)
+        self.button.setCursor(Qt.CursorShape.PointingHandCursor)
+        menu = QMenu(self.button)
+        self._choose = menu.addAction(f"{self._title}…")
+        self._choose.triggered.connect(self._on_choose)
+        self._random = menu.addAction("Random")
+        self._random.setCheckable(True)
+        self._random.triggered.connect(self._on_random)
+        self._stop = menu.addAction("Stop")
+        self._stop.triggered.connect(self._on_stop)
+        self.button.setMenu(menu)
+        self._show_look()
+
+    def set_texts(self, title: str, random_text: str, stop_text: str) -> None:
+        """The button's and menu's words, translated by the window."""
+        log.info("VideoFolderControls.set_texts: %r / %r / %r",
+                 title, random_text, stop_text)
+        self._title = title
+        self.button.setText(title)
+        self._choose.setText(f"{title}…")
+        self._random.setText(random_text)
+        self._stop.setText(stop_text)
+        self._show_look()
+
+    def _on_choose(self, *_qt_args) -> None:
+        """The menu's folder item: the window asks for a folder, then
+        switches the playlist on."""
+        log.info("VideoFolderControls._on_choose: shown folder=%s", self.folder)
+        self._panel.video_folder_requested.emit()
+
+    def _on_random(self, checked: bool) -> None:
+        """Random toggled: saved either way; a playing folder keeps its video
+        and picks the next one in the new order."""
+        log.info("VideoFolderControls._on_random: %s -> %s (enabled=%s)",
+                 self.shuffle, checked, self.enabled)
+        self._panel.invoke_delegate(self._panel.CMD_VIDEO_FOLDER, None,
+                                    {"enabled": self.enabled, "folder": None,
+                                     "shuffle": checked})
+
+    def _on_stop(self, *_qt_args) -> None:
+        """Stop: the playlist ends, the video showing keeps playing."""
+        log.info("VideoFolderControls._on_stop: enabled=%s", self.enabled)
+        self._panel.invoke_delegate(self._panel.CMD_VIDEO_FOLDER, None,
+                                    {"enabled": False, "folder": None,
+                                     "shuffle": None})
+
+    def show(self, enabled: bool, folder: str | None, shuffle: bool) -> None:
+        """Show the App's playlist -- READ only."""
+        log.info("VideoFolderControls.show: %s/%s/%s -> %s/%s/%s",
+                 self.enabled, self.folder, self.shuffle,
+                 enabled, folder, shuffle)
+        self.enabled, self.folder, self.shuffle = enabled, folder, shuffle
+        self._show_look()
+
+    def _show_look(self) -> None:
+        """Border, tooltip and menu state from what is shown."""
+        log.debug("VideoFolderControls._show_look: enabled=%s folder=%s",
+                  self.enabled, self.folder)
+        self.button.setStyleSheet(
+            _VIDEO_FOLDER_STYLE + (_VIDEO_FOLDER_ON_STYLE if self.enabled else ""))
+        # The path is the user's own, shown as-is; with none, the title.
+        self.button.setToolTip(self.folder or self._title)
+        self._random.setChecked(self.shuffle)
+        self._stop.setEnabled(self.enabled)
 

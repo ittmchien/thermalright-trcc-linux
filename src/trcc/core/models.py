@@ -816,6 +816,13 @@ class DeviceSettings:
     slideshow_enabled: bool = False
     slideshow_interval_s: float = 60.0
     slideshow_themes: list[str] = field(default_factory=list)
+    # Video folder playlist -- while ``video_folder_enabled``, the videos
+    # directly in ``video_folder_path`` play one after another, by name or
+    # shuffled (``video_folder_shuffle``).  A config without these fields
+    # loads with them off.  The cursor lives in VideoFolderService (transient).
+    video_folder_enabled: bool = False
+    video_folder_path: str | None = None
+    video_folder_shuffle: bool = False
     # Game mode -- the C#'s ``isGame`` / ``myCPU`` (UCThemeLocal.cs:122-123):
     # while on, a CPU usage above ``game_threshold`` percent for 11 seconds
     # running swaps the panel to a black, overlay-only frame.  The threshold
@@ -1553,6 +1560,11 @@ STREAM_SCHEMES: frozenset[str] = frozenset({"http", "https", "rtsp"})
 #: how late a switch can be.  One second against a default 30-second slideshow
 #: is 3% late at worst, and the poll itself is a settings read.
 SLIDESHOW_POLL_S = 1.0
+
+#: How often the video-folder driver asks whether the playing video has ended
+#: (feature: video folder playlist).  Bounds how long the last frame is held
+#: before the next video starts; the check is a cursor read, so it is cheap.
+VIDEO_FOLDER_POLL_S = 0.25
 
 #: How often game mode reads its row: the C#'s check runs every 64th tick
 #: (FormCZTV.cs:2849) of a 15 ms timer (Form1.cs:502), which Windows fires at

@@ -74,6 +74,7 @@ from trcc.core.events import (
     VideoAdvanced,
     VideoExportFinished,
     VideoExportProgress,
+    VideoFolderChanged,
     VideoPauseChanged,
     VideoStarted,
     VideoStopped,
@@ -93,7 +94,9 @@ DeviceSettingsEvent: TypeAlias = (
     BrightnessChanged | OrientationChanged | SplitModeChanged | GameModeChanged
     | FitModeChanged | OverlayChanged | BackgroundChanged
     | MaskApplied | MaskPositionChanged | MaskVisibilityChanged
-    | ScreencastRegionChanged | LedSettingsChanged)
+    | ScreencastRegionChanged | LedSettingsChanged
+    # Feature: video folder playlist -- the gui re-reads LcdSnapshot on it.
+    | VideoFolderChanged)
 
 
 class BusBridge(QObject):

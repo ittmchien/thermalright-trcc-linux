@@ -385,6 +385,20 @@ class SlideshowChanged(Event):
     themes: tuple[str, ...]
 
 
+# Feature: video folder playlist -- every UI follows the one saved state.
+@dataclass(frozen=True, slots=True)
+class VideoFolderChanged(Event):
+    """A device's video folder playlist was set up, switched on or off.
+
+    By any UI, or by its driver ending it when another source took the
+    panel.  ``folder`` is ``""`` when none was ever chosen.
+    """
+    key: str
+    enabled: bool
+    folder: str
+    shuffle: bool
+
+
 @dataclass(frozen=True, slots=True)
 class LedColorsChanged(Event):
     key: str

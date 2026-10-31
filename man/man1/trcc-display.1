@@ -1171,6 +1171,34 @@ Options:
 \fB\-\-help\fR
 Show this command's help and exit.
 .RE
+.SS video\-folder
+.PP
+\fBtrcc display video\-folder\fR \fIKEY\fR [\fIFOLDER\fR] [\fIOPTIONS\fR]
+.PP
+Play the videos in a folder one after another, in order or shuffled. The App plays the playlist, so it keeps going after this command exits while the App runs. Picking another theme or background from any UI ends it.
+.PP
+Arguments:
+.RS 4
+.TP
+\fBKEY\fR
+Device key, e.g. 0402:3922
+.TP
+\fBFOLDER\fR
+Folder whose videos play one after another (omit to resume the saved folder)
+.RE
+.PP
+Options:
+.RS 4
+.TP
+\fB\-\-shuffle\fR
+Random order, each video once per round (default: unchanged)
+.TP
+\fB\-\-off\fR
+Stop the playlist; the video showing keeps playing
+.TP
+\fB\-\-help\fR
+Show this command's help and exit.
+.RE
 .SS video\-status
 .PP
 \fBtrcc display video\-status\fR \fIKEY\fR

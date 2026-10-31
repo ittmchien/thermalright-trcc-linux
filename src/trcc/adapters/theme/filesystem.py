@@ -58,6 +58,7 @@ from ...core.models import (
 from ...core.ports import ContentStore, SingleFileTheme
 from ...services import _dc as Dc
 from ...services import _tr as Tr
+from ...services.video_folder import name_order
 
 if TYPE_CHECKING:
     from ...core.ports import Paths
@@ -578,6 +579,21 @@ class FileContentStore(ContentStore):
         log.debug("list: %s → %d theme(s) (skipped=%d)",
                  directory, len(themes), skipped)
         return themes
+
+    # Feature: video folder playlist -- one non-recursive scan per call, so a
+    # file added or removed between two videos is seen by the next pick.
+    def list_videos(self, directory: Path) -> builtins.list[Path]:
+        """Every video directly in *directory*, sorted by name (see port)."""
+        try:
+            videos = [entry for entry in directory.iterdir()
+                      if entry.is_file()
+                      and MEDIA.kind_of(entry) is MediaKind.ANIMATED]
+        except OSError as e:
+            log.warning("list_videos: cannot read %s -- %s", directory, e)
+            return []
+        videos.sort(key=name_order)
+        log.debug("list_videos: %s -> %d video(s)", directory, len(videos))
+        return videos
 
     def list_web_previews(
         self, web_dir: Path,

@@ -1110,6 +1110,24 @@ trcc display video-duration PATH
 |---|---|
 | `PATH` | Video file to probe |
 
+### `trcc display video-folder`
+
+Play the videos in a folder one after another, in order or shuffled. The App plays the playlist, so it keeps going after this command exits while the App runs. Picking another theme or background from any UI ends it.
+
+```bash
+trcc display video-folder [OPTIONS] KEY [FOLDER]
+```
+
+| Argument | Description |
+|---|---|
+| `KEY` | Device key, e.g. 0402:3922 |
+| `FOLDER` | Folder whose videos play one after another (omit to resume the saved folder) *(optional)* |
+
+| Option | Description |
+|---|---|
+| `--shuffle` | Random order, each video once per round (default: unchanged) |
+| `--off` | Stop the playlist; the video showing keeps playing |
+
 ### `trcc display video-status`
 
 Report what the device's video playback is doing (read-only). Answers "is a video loaded, where is it, how fast" without rendering a frame — the query half of the video surface, alongside `play-video` / `stop-video` / `pause-video` / `seek-video` / `loop-video`.

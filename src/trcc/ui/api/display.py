@@ -60,6 +60,7 @@ from trcc.core.commands import (
     SetScreencastRegion,
     SetSlideshow,
     SetSplitMode,
+    SetVideoFolder,
     SleepDevice,
     StartScreencast,
     StopScreencast,
@@ -103,6 +104,7 @@ from trcc.core.results import (
     ThemeResult,
     VideoDurationResult,
     VideoExportResult,
+    VideoFolderResult,
     VideoResult,
 )
 
@@ -151,6 +153,7 @@ from .schemas import (
     SplitModeRequest,
     ThemeRequest,
     ThemeResponse,
+    VideoFolderRequest,
     VideoStatusResponse,
 )
 
@@ -985,6 +988,25 @@ def slideshow_toggle(key: str, body: SlideshowToggleRequest,
     result = request.app.state.trcc.dispatch(
         SetSlideshow(key=key, enabled=body.enabled),
     )
+    http_error_if_failed(result)
+    return result
+
+
+# Feature: video folder playlist -- the folder is confined like every read.
+@router.post("/video-folder")
+def video_folder(key: str, body: VideoFolderRequest,
+                 request: Request) -> VideoFolderResult:
+    """Play the videos in a folder one after another -- or stop (enabled=false).
+
+    Dispatches :class:`SetVideoFolder`; the App plays the playlist, in order
+    or shuffled, until it is switched off or another source takes the panel.
+    """
+    log.info("api POST /devices/{key}/display/video-folder: key=%s enabled=%s "
+             "folder=%s shuffle=%s", key, body.enabled, body.folder, body.shuffle)
+    folder = owned_path(request, body.folder) if body.folder else None
+    result = request.app.state.trcc.dispatch(SetVideoFolder(
+        key=key, enabled=body.enabled, folder=folder, shuffle=body.shuffle,
+    ))
     http_error_if_failed(result)
     return result
 

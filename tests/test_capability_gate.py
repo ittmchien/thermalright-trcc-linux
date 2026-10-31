@@ -61,6 +61,7 @@ def _commands(key: str, tmp: Path) -> list[Command[Any]]:
         C.RestoreDeviceState(key=key),
         C.ConfigureSlideshow(key=key, themes=("a",), interval_s=5.0),
         C.SetSlideshow(key=key, enabled=True),
+        C.SetVideoFolder(key=key, enabled=True, folder=tmp),
         C.ExportCurrentTheme(key=key, archive_path=tmp / "out.tr"),
         PlayVisual(key=key, visual="trcc-pipes"),
         C.ClearModuleSource(key=key, module="visualizer"),

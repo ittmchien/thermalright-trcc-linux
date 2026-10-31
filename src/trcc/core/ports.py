@@ -1693,6 +1693,17 @@ class ContentStore(ABC):
         never fails on one bad theme.
         """
 
+    # Feature: video folder playlist -- the folder read stays behind the port.
+    @abstractmethod
+    def list_videos(self, directory: Path) -> builtins.list[Path]:
+        """Every video file directly in *directory* (not its subfolders),
+        sorted by name.
+
+        A video is what plays as an animated background
+        (``MediaKind.ANIMATED``).  ``[]`` when *directory* is missing, is not
+        a folder or cannot be read -- listing never raises.
+        """
+
     @abstractmethod
     def list_web_previews(
         self, web_dir: Path,

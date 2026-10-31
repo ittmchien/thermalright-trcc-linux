@@ -64,6 +64,7 @@ from ._base import Command, Query
 from ._helpers import (
     _drive_game_mode,
     _drive_slideshow,
+    _drive_video_folder,
     _invalidate_scene,
     _live_sensors,
     _publish_if_disconnect,
@@ -2033,6 +2034,7 @@ def show_orientation_theme(app: App, key: str, degrees: int | None = None) -> No
     the theme their own way -- and the rotation kept the folder it left.
     """
     from ...services.slideshow_driver import task_key
+    from ...services.video_folder_driver import task_key as video_folder_task
 
     visit = enter_orientation(app, key, degrees)
     log.info("show_orientation_theme: %s %s folder", key, visit or "unknown")
@@ -2040,12 +2042,16 @@ def show_orientation_theme(app: App, key: str, degrees: int | None = None) -> No
     # hand and switches the slideshow off.  ``_drive_slideshow`` below starts
     # a fresh driver (tested); removing it first closes the window in which
     # the OLD driver ticks during the load -- a race no test can time.
+    # Feature: video folder playlist -- its driver reads the theme the same
+    # way, so it is taken off and re-driven around the load too.
     app.remove_task(task_key(key))
+    app.remove_task(video_folder_task(key))
     _show_saved_theme(app, key, keep_overrides=degrees is not None,
                       degrees=degrees)
     if visit == "first":
         app.settings.mark_entered(key)
     _drive_slideshow(app, key)
+    _drive_video_folder(app, key)
     _drive_game_mode(app, key)
 
 
@@ -2110,6 +2116,12 @@ class RestoreDeviceState(Command[ThemeResult]):
             log.info("RestoreDeviceState: %s resuming its media player %s",
                      self.key, s.media_player_uri)
             app.dispatch(SetMediaPlayer(key=self.key, uri=s.media_player_uri))
+        elif s.video_folder_enabled:
+            # Feature: video folder playlist -- its driver (started by
+            # ``show_orientation_theme`` above) owns the background and plays
+            # the next video; replaying the saved one here would race it.
+            log.info("RestoreDeviceState: %s plays its video folder %s",
+                     self.key, s.video_folder_path)
         elif s.background_path:
             log.info("RestoreDeviceState: %s replaying persisted background %s",
                      self.key, s.background_path)

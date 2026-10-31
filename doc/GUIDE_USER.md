@@ -115,6 +115,13 @@ Set up automatic theme rotation:
 
 Themes cycle automatically at the configured interval.
 
+### Video Folder Playlist
+Play every video in a folder, one after another:
+1. On the **Local themes** header, click **Video folder** and pick a folder
+2. Tick **Random** in the same menu for a shuffled order (each video once per round); **Stop** ends the playlist
+
+Only the videos directly in the folder play, sorted by name; files added or removed while it plays are picked up. The App plays the playlist, so closing the window does not stop it; picking another theme, background, screencast or media player — or switching the slideshow on — ends it. CLI: `trcc display video-folder 0402:3922 ~/Videos/panel --shuffle` (and `--off` to stop). API: `POST /devices/{key}/display/video-folder`.
+
 ### Game Mode
 The game button on the **Local themes** header, with the CPU % box beside it (default 75): while CPU usage stays above that threshold, the panel shows only its overlay, on black, until usage falls back. CLI: `trcc display game 0402:3922 on --threshold 80`.
 

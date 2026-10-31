@@ -149,6 +149,7 @@ from .system import (
     SetSlideshow,
     SetTempUnit,
     SetTimeFormat,
+    SetVideoFolder,
     StopDaemon,
     UpdateStatus,
 )
@@ -318,6 +319,7 @@ __all__ = [
     "SetSplitMode",
     "SetTempUnit",
     "SetTimeFormat",
+    "SetVideoFolder",
     "SetWeekStart",
     "SleepDevice",
     "StartScreencast",

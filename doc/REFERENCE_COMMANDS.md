@@ -4,7 +4,7 @@
 
 Every capability in TRCC, as the one surface all four UIs dispatch against. A new UI — a browser client, a VR panel, a TUI — needs only this page and an event subscription; it never imports a service or an adapter.
 
-**171 total: 122 Commands and 49 Queries.** A *Query* is a read and nothing else, which is why it is named separately — a missing read should be obvious rather than archaeological.
+**172 total: 123 Commands and 49 Queries.** A *Query* is a read and nothing else, which is why it is named separately — a missing read should be obvious rather than archaeological.
 
 ## Dispatching one
 
@@ -1562,6 +1562,19 @@ Set every time element's clock to 12h or 24h — on ``key``, or on every device 
 |---|---|---|
 | `fmt` | `str` | yes |
 | `key` | `str | None` | no |
+
+### `SetVideoFolder`
+
+Play the videos in a folder one after another — or stop doing so.
+
+*Command* → `VideoFolderResult`
+
+| Field | Type | Required |
+|---|---|---|
+| `key` | `str` | yes |
+| `enabled` | `bool` | no |
+| `folder` | `Path | None` | no |
+| `shuffle` | `bool | None` | no |
 
 ### `StopDaemon`
 

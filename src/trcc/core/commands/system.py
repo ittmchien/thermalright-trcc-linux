@@ -26,9 +26,11 @@ from ..events import (
 from ..models import (
     AUTOSTART_TARGETS,
     MAX_REFRESH_INTERVAL_S,
+    MEDIA,
     MIN_REFRESH_INTERVAL_S,
     TIME_FORMATS,
     Capability,
+    MediaKind,
     ModuleInfo,
     PanelConfig,
     SensorBinding,
@@ -76,18 +78,24 @@ from ..results import (
     TimeFormatResult,
     UpdateCheckResult,
     UpgradeResult,
+    VideoFolderResult,
 )
 from ._base import Command, Query
 from ._helpers import (
     _autostart_path,
     _drive_slideshow,
+    _drive_video_folder,
     _health_entries,
     _invalidate_scene,
+    _loop_folder_video_again,
     _publish_slideshow,
+    _publish_video_folder,
     _require_connected_device,
     _resolve_oriented_resolution,
     _slideshow_snapshot,
+    _video_folder_snapshot,
     fan_slot_pins,
+    play_next_folder_video,
 )
 from .theme import RestoreDeviceState
 
@@ -1169,12 +1177,104 @@ class SetSlideshow(Command[SlideshowResult]):
 
     def execute(self, app: App) -> SlideshowResult:
         log.info("SetSlideshow.execute: %s enabled=%s", self.key, self.enabled)
+        # Feature: video folder playlist -- one source at a time, so a
+        # slideshow switched on ends a playing video folder first.
+        if self.enabled and app.settings.for_device(self.key).video_folder_enabled:
+            log.info("SetSlideshow.execute: %s — switching the video folder "
+                     "off first", self.key)
+            app.dispatch(SetVideoFolder(key=self.key, enabled=False))
         app.settings.set_slideshow_enabled(self.key, self.enabled)
         if self.enabled:
             app.slideshow.reset(self.key)
         _drive_slideshow(app, self.key)
         _publish_slideshow(app, self.key)
         return _slideshow_snapshot(app.settings, self.key)
+
+
+@dataclass(frozen=True, slots=True)
+class SetVideoFolder(Command[VideoFolderResult]):
+    """Play the videos in a folder one after another — or stop doing so.
+
+    Feature: video folder playlist.  On: the folder's videos (directly in
+    it, by name) play once each, in order or shuffled, round and round; the
+    first starts now, and ``VideoFolderDriver`` -- in the App, so closing a
+    UI does not stop it -- starts each next one when the last ends.  A
+    slideshow is switched off first: one source at a time.  Off: the driver
+    stops and the video showing keeps playing, looped.
+
+    ``folder`` and ``shuffle`` are saved when given; ``None`` keeps the saved
+    value, so ``enabled=True`` alone resumes the saved folder.  The driver
+    dispatches this with ``enabled=False`` when another source takes the panel.
+    """
+    REQUIRES: ClassVar[Capability | None] = Capability.BACKGROUND
+    key: str
+    enabled: bool = True
+    folder: Path | None = None
+    shuffle: bool | None = None
+
+    def execute(self, app: App) -> VideoFolderResult:
+        from ...services.video_folder_driver import task_key
+
+        log.info("SetVideoFolder.execute: %s enabled=%s folder=%s shuffle=%s",
+                 self.key, self.enabled, self.folder, self.shuffle)
+        s = app.settings.for_device(self.key)
+        folder_arg = str(self.folder) if self.folder is not None else None
+        if not self.enabled:
+            was_on = s.video_folder_enabled
+            app.settings.set_video_folder(self.key, enabled=False,
+                                          folder=folder_arg, shuffle=self.shuffle)
+            _drive_video_folder(app, self.key)
+            if was_on:
+                _loop_folder_video_again(app, self.key)
+            _publish_video_folder(app, self.key)
+            return _video_folder_snapshot(app, self.key)
+
+        folder = folder_arg or s.video_folder_path
+        if not folder:
+            log.warning("SetVideoFolder.execute: %s — no folder given and none "
+                        "saved", self.key)
+            return VideoFolderResult(
+                ok=False, key=self.key,
+                message="No video folder given, and none saved for this device",
+            )
+        videos = app.themes.list_videos(Path(folder))
+        if not videos:
+            log.warning("SetVideoFolder.execute: %s — %s holds no videos",
+                        self.key, folder)
+            return VideoFolderResult(
+                ok=False, key=self.key, folder=folder,
+                message=(f"No videos in {folder} (it must be a folder holding "
+                         f"files of {sorted(MEDIA.exts(MediaKind.ANIMATED))})"),
+            )
+        # The same folder already playing (a Random toggle): keep the video
+        # showing and let the next pick use the new order.  Otherwise start
+        # the folder's first video now.
+        restart = not (s.video_folder_enabled and s.video_folder_path == folder)
+        app.settings.set_video_folder(self.key, enabled=True, folder=folder,
+                                      shuffle=self.shuffle)
+        if s.slideshow_enabled:
+            app.dispatch(SetSlideshow(key=self.key, enabled=False))
+        if restart:
+            # The old driver would read this video as another source's.
+            app.remove_task(task_key(self.key))
+            app.video_folder.reset(self.key)
+            played = play_next_folder_video(app, self.key)
+            if played is None or not played.ok:
+                why = played.message if played else f"No videos in {folder}"
+                log.warning("SetVideoFolder.execute: %s — the first video did "
+                            "not start: %s", self.key, why)
+                app.settings.set_video_folder(self.key, enabled=False)
+                _publish_video_folder(app, self.key)
+                return VideoFolderResult(ok=False, key=self.key, folder=folder,
+                                         message=why)
+        _drive_video_folder(app, self.key)
+        _publish_video_folder(app, self.key)
+        shuffled = app.settings.for_device(self.key).video_folder_shuffle
+        order = "shuffled" if shuffled else "in order"
+        return _video_folder_snapshot(
+            app, self.key, video_count=len(videos),
+            message=f"Playing {len(videos)} video(s) from {folder}, {order}",
+        )
 
 @dataclass(frozen=True, slots=True)
 class KeepAliveLoop(Command[KeepaliveResult]):

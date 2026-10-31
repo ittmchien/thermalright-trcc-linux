@@ -415,6 +415,9 @@ class LCDHandler(BaseHandler):
         # None is the default place, which the render draws at (0, 0).
         settings.set_mask_position(*(ds.mask_position or (0, 0)))
         self._w['theme_local'].show_game_mode(ds.game_enabled, ds.game_threshold)
+        # Feature: video folder playlist.
+        self._w['theme_local'].show_video_folder(
+            ds.video_folder_enabled, ds.video_folder_path, ds.video_folder_shuffle)
 
     def _restore_brightness(self, ds: LcdSnapshotResult) -> None:
         self._pm.brightness_level = ds.brightness
@@ -1090,6 +1093,27 @@ class LCDHandler(BaseHandler):
         self._app.dispatch(SetGameMode(
             key=self._device_key, enabled=change.get("enabled"),
             threshold=change.get("threshold")))
+
+    def on_video_folder_delegate(self, change: dict[str, Any]) -> None:
+        """The video folder button (feature: video folder playlist): send its
+        change through the Command bus.
+
+        The button shows the result when the App's ``VideoFolderChanged``
+        comes back (``follow_app``); a refusal (no videos in the folder) is
+        shown on the preview's status line.
+        """
+        from ...core.commands import SetVideoFolder
+
+        self.log.info("on_video_folder_delegate: device=%s %s",
+                      self._device_key, change)
+        folder = change.get("folder")
+        result = self._app.dispatch(SetVideoFolder(
+            key=self._device_key, enabled=bool(change.get("enabled")),
+            folder=Path(folder) if folder else None,
+            shuffle=change.get("shuffle")))
+        if not result.ok:
+            self.log.warning("on_video_folder_delegate: %s", result.message)
+            self._w['preview'].set_status(f"Error: {result.message}")
 
     def on_slideshow_delegate(self) -> None:
         """Handle slideshow toggle from local theme panel."""

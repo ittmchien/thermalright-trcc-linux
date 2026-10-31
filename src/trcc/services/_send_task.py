@@ -125,3 +125,19 @@ class BaseSendTask(SendTask):
     @abstractmethod
     def _run(self, now: float) -> float:
         """One turn of the task's work; return the seconds until the next."""
+
+
+# Shared by the drivers that own what the panel shows (slideshow, video
+# folder playlist): each compares it with what IT last put there, to notice
+# another UI taking the panel and step aside -- one source at a time.
+def shown_on_panel(app: App, device_key: str) -> tuple[object, ...]:
+    """What *device_key*'s panel shows now: the theme, and any source over it.
+
+    The theme as ``current_theme`` -- the resolved path every ``LoadTheme``
+    persists -- so this is a settings read, not a filesystem one.
+    """
+    s = app.settings.for_device(device_key)
+    frame_log.debug("shown_on_panel: %s theme=%s background=%s", device_key,
+                    s.current_theme, s.background_path)
+    return (s.current_theme, s.background_path, s.screencast_region,
+            s.media_player_uri)

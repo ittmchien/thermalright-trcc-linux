@@ -3642,6 +3642,10 @@ class LcdSnapshot(Query[LcdSnapshotResult]):
             overlay_background=s.overlay_background,
             game_enabled=s.game_enabled,
             game_threshold=s.game_threshold,
+            # Feature: video folder playlist.
+            video_folder_enabled=s.video_folder_enabled,
+            video_folder_path=s.video_folder_path,
+            video_folder_shuffle=s.video_folder_shuffle,
             message=f"LCD snapshot for {self.key}",
         )
 

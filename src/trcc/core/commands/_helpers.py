@@ -16,6 +16,7 @@ from ..events import (
     LedSettingsChanged,
     SlideshowChanged,
     SplitModeChanged,
+    VideoFolderChanged,
 )
 from ..models import (
     Capability,
@@ -31,12 +32,14 @@ from ..results import (
     OverlayElementEntry,
     OverlayLayoutResult,
     SlideshowResult,
+    VideoFolderResult,
 )
 
 if TYPE_CHECKING:
     from ...app import App
     from ...services.theme_directories import ThemeDirectories
     from ..models import DeviceSettings, ProductInfo, SensorBinding
+    from ..results import BackgroundResult
 
 from ..logs import per_frame, recurring_warning
 from ..models import (
@@ -822,6 +825,94 @@ def _drive_slideshow(app: App, key: str) -> None:
     else:
         log.info("_drive_slideshow: %s is off — not driving it", key)
         app.remove_task(task_key(key))
+
+
+# ── Video folder playlist (feature) ──────────────────────────────────────
+
+
+def _video_folder_snapshot(app: App, key: str, *, video_count: int = 0,
+                           message: str = "") -> VideoFolderResult:
+    """*key*'s saved playlist as a Result -- what every UI is told."""
+    s = app.settings.for_device(key)
+    log.debug("_video_folder_snapshot: %s enabled=%s folder=%s", key,
+              s.video_folder_enabled, s.video_folder_path)
+    order = "shuffled" if s.video_folder_shuffle else "in order"
+    return VideoFolderResult(
+        ok=True, key=key, enabled=s.video_folder_enabled,
+        folder=s.video_folder_path, shuffle=s.video_folder_shuffle,
+        video_count=video_count,
+        message=message or (
+            f"Video folder {'on' if s.video_folder_enabled else 'off'} "
+            f"({s.video_folder_path or 'no folder chosen'}, {order})"),
+    )
+
+
+def _publish_video_folder(app: App, key: str) -> None:
+    """Tell every UI the playlist's saved state, whoever changed it."""
+    s = app.settings.for_device(key)
+    log.info("_publish_video_folder: %s enabled=%s folder=%s shuffle=%s",
+             key, s.video_folder_enabled, s.video_folder_path,
+             s.video_folder_shuffle)
+    app.events.publish(VideoFolderChanged(
+        key=key, enabled=s.video_folder_enabled,
+        folder=s.video_folder_path or "", shuffle=s.video_folder_shuffle,
+    ))
+
+
+def _drive_video_folder(app: App, key: str) -> None:
+    """Play *key*'s video folder while it is switched on, and only then --
+    for ``SetVideoFolder`` and for every restore / rotation, as
+    ``_drive_slideshow`` is."""
+    from ...services.video_folder_driver import VideoFolderDriver, task_key
+
+    if app.settings.for_device(key).video_folder_enabled:
+        log.info("_drive_video_folder: %s is on — driving it", key)
+        app.add_task(VideoFolderDriver(app, key))
+    else:
+        log.info("_drive_video_folder: %s is off — not driving it", key)
+        app.remove_task(task_key(key))
+
+
+def play_next_folder_video(app: App, key: str) -> BackgroundResult | None:
+    """Start the playlist's next video on *key*, to play once through.
+
+    The one way a playlist video starts -- ``SetVideoFolder``'s first and the
+    driver's every next -- so both go through ``SetBackground``, the same
+    Command as a background the user picks.  ``None`` when the folder has no
+    videos (it is re-read here, so added and removed files count).
+    """
+    from .device import LoopVideo, SetBackground
+
+    s = app.settings.for_device(key)
+    if not s.video_folder_path:
+        log.warning("play_next_folder_video: %s has no folder saved", key)
+        return None
+    videos = app.themes.list_videos(Path(s.video_folder_path))
+    path = app.video_folder.next(key, videos, shuffle=s.video_folder_shuffle)
+    if path is None:
+        return None
+    result = app.dispatch(SetBackground(key=key, path=path))
+    if result.ok:
+        # Once through: it ends at its last frame, which the driver waits for.
+        app.dispatch(LoopVideo(key=key, loop=False))
+    log.info("play_next_folder_video: %s → %s ok=%s", key, path.name, result.ok)
+    return result
+
+
+def _loop_folder_video_again(app: App, key: str) -> None:
+    """Switched off by the user: the playlist video showing keeps playing,
+    looped like any background, instead of freezing on its last frame."""
+    from .device import LoopVideo
+
+    s = app.settings.for_device(key)
+    current = s.background_path
+    ours = (current is not None and s.video_folder_path is not None
+            and Path(current).parent == Path(s.video_folder_path)
+            and app.media.playback(key) is not None)
+    log.info("_loop_folder_video_again: %s background=%s from the folder=%s",
+             key, current, ours)
+    if ours:
+        app.dispatch(LoopVideo(key=key, loop=True))
 
 
 def _autostart_path(app: App) -> str:

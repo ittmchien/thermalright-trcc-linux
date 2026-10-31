@@ -277,6 +277,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         'Developer mode': '开发者模式',
         'Install from folder…': '从文件夹安装…',
         'Choose a module folder': '选择模块文件夹',
+        'Video folder': '视频文件夹',
+        'Random': '随机',
+        'Stop': '停止',
     },
     'zh_TW': {
         'Layer Mask': '佈局蒙板',
@@ -410,6 +413,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         'Developer mode': '開發人員模式',
         'Install from folder…': '從資料夾安裝…',
         'Choose a module folder': '選擇模組資料夾',
+        'Video folder': '影片資料夾',
+        'Random': '隨機',
+        'Stop': '停止',
     },
     'en': {
         'Layer Mask': 'Layer Mask',
@@ -544,6 +550,10 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         'FRI': 'FRI',
         'SAT': 'SAT',
         'SUN': 'SUN',
+        # Video folder playlist (feature)
+        'Video folder': 'Video folder',
+        'Random': 'Random',
+        'Stop': 'Stop',
     },
     'de': {
         'Layer Mask': 'Ebenenmaske',
@@ -677,6 +687,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         'Developer mode': 'Entwicklermodus',
         'Install from folder…': 'Aus Ordner installieren…',
         'Choose a module folder': 'Modulordner auswählen',
+        'Video folder': 'Videoordner',
+        'Random': 'Zufällig',
+        'Stop': 'Stopp',
     },
     'ru': {
         'Layer Mask': 'Покрытие',
@@ -810,6 +823,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         'Developer mode': 'Режим разработчика',
         'Install from folder…': 'Установить из папки…',
         'Choose a module folder': 'Выберите папку модуля',
+        'Video folder': 'Папка видео',
+        'Random': 'Случайно',
+        'Stop': 'Стоп',
     },
     'fr': {
         'Layer Mask': 'Masque de couche',
@@ -943,6 +959,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         'Developer mode': 'Mode développeur',
         'Install from folder…': 'Installer depuis un dossier…',
         'Choose a module folder': 'Choisir un dossier de module',
+        'Video folder': 'Dossier vidéo',
+        'Random': 'Aléatoire',
+        'Stop': 'Arrêter',
     },
     'pt': {
         'Layer Mask': 'Máscara de camada',
@@ -1076,6 +1095,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         'Developer mode': 'Modo de desenvolvedor',
         'Install from folder…': 'Instalar de uma pasta…',
         'Choose a module folder': 'Escolher uma pasta de módulo',
+        'Video folder': 'Pasta de vídeos',
+        'Random': 'Aleatório',
+        'Stop': 'Parar',
     },
     'ja': {
         'Layer Mask': 'レイヤーマスク',
@@ -1209,6 +1231,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         'Developer mode': '開発者モード',
         'Install from folder…': 'フォルダーからインストール…',
         'Choose a module folder': 'モジュールフォルダーを選択',
+        'Video folder': '動画フォルダー',
+        'Random': 'ランダム',
+        'Stop': '停止',
     },
     'es': {
         'Layer Mask': 'Mascarilla de capa',
@@ -1342,6 +1367,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         'Developer mode': 'Modo de desarrollador',
         'Install from folder…': 'Instalar desde carpeta…',
         'Choose a module folder': 'Elegir una carpeta de módulo',
+        'Video folder': 'Carpeta de vídeos',
+        'Random': 'Aleatorio',
+        'Stop': 'Detener',
     },
     'ko': {
         'Layer Mask': '레이어 마스크',
@@ -1475,6 +1503,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         'Developer mode': '개발자 모드',
         'Install from folder…': '폴더에서 설치…',
         'Choose a module folder': '모듈 폴더 선택',
+        'Video folder': '동영상 폴더',
+        'Random': '무작위',
+        'Stop': '중지',
     },
     'it': {
         'Layer Mask': 'Maschera livello',
@@ -1608,6 +1639,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         'Developer mode': 'Modalità sviluppatore',
         'Install from folder…': 'Installa da cartella…',
         'Choose a module folder': 'Scegli una cartella del modulo',
+        'Video folder': 'Cartella video',
+        'Random': 'Casuale',
+        'Stop': 'Ferma',
     },
     'nl': {
         'Layer Mask': 'Laagmasker',
@@ -1741,6 +1775,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         'Developer mode': 'Ontwikkelaarsmodus',
         'Install from folder…': 'Installeren vanuit map…',
         'Choose a module folder': 'Kies een modulemap',
+        'Video folder': 'Videomap',
+        'Random': 'Willekeurig',
+        'Stop': 'Stoppen',
     },
     'pl': {
         'Layer Mask': 'Maska warstwy',
@@ -1874,6 +1911,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         'Developer mode': 'Tryb dewelopera',
         'Install from folder…': 'Zainstaluj z folderu…',
         'Choose a module folder': 'Wybierz folder modułu',
+        'Video folder': 'Folder wideo',
+        'Random': 'Losowo',
+        'Stop': 'Zatrzymaj',
     },
     'tr': {
         'Layer Mask': 'Katman maskesi',
@@ -2007,6 +2047,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         'Developer mode': 'Geliştirici modu',
         'Install from folder…': 'Klasörden yükle…',
         'Choose a module folder': 'Bir modül klasörü seçin',
+        'Video folder': 'Video klasörü',
+        'Random': 'Rastgele',
+        'Stop': 'Durdur',
     },
     'ar': {
         'Layer Mask': 'قناع الطبقة',
@@ -2140,6 +2183,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         'Developer mode': 'وضع المطوّر',
         'Install from folder…': 'التثبيت من مجلد…',
         'Choose a module folder': 'اختر مجلد الوحدة',
+        'Video folder': 'مجلد الفيديو',
+        'Random': 'عشوائي',
+        'Stop': 'إيقاف',
     },
     'hi': {
         'Layer Mask': 'लेयर मास्क',
@@ -2273,6 +2319,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         'Developer mode': 'डेवलपर मोड',
         'Install from folder…': 'फ़ोल्डर से इंस्टॉल करें…',
         'Choose a module folder': 'मॉड्यूल फ़ोल्डर चुनें',
+        'Video folder': 'वीडियो फ़ोल्डर',
+        'Random': 'यादृच्छिक',
+        'Stop': 'रोकें',
     },
     'th': {
         'Layer Mask': 'มาสก์เลเยอร์',
@@ -2406,6 +2455,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         'Developer mode': 'โหมดนักพัฒนา',
         'Install from folder…': 'ติดตั้งจากโฟลเดอร์…',
         'Choose a module folder': 'เลือกโฟลเดอร์โมดูล',
+        'Video folder': 'โฟลเดอร์วิดีโอ',
+        'Random': 'สุ่ม',
+        'Stop': 'หยุด',
     },
     'vi': {
         'Layer Mask': 'Mặt nạ lớp',
@@ -2539,6 +2591,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         'Developer mode': 'Chế độ nhà phát triển',
         'Install from folder…': 'Cài đặt từ thư mục…',
         'Choose a module folder': 'Chọn thư mục mô-đun',
+        'Video folder': 'Thư mục video',
+        'Random': 'Ngẫu nhiên',
+        'Stop': 'Dừng',
     },
     'id': {
         'Layer Mask': 'Masker lapisan',
@@ -2672,6 +2727,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         'Developer mode': 'Mode pengembang',
         'Install from folder…': 'Pasang dari folder…',
         'Choose a module folder': 'Pilih folder modul',
+        'Video folder': 'Folder video',
+        'Random': 'Acak',
+        'Stop': 'Hentikan',
     },
     'cs': {
         'Layer Mask': 'Maska vrstvy',
@@ -2805,6 +2863,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         'Developer mode': 'Režim vývojáře',
         'Install from folder…': 'Instalovat ze složky…',
         'Choose a module folder': 'Vyberte složku modulu',
+        'Video folder': 'Složka videí',
+        'Random': 'Náhodně',
+        'Stop': 'Zastavit',
     },
     'sv': {
         'Layer Mask': 'Lagermask',
@@ -2938,6 +2999,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         'Developer mode': 'Utvecklarläge',
         'Install from folder…': 'Installera från mapp…',
         'Choose a module folder': 'Välj en modulmapp',
+        'Video folder': 'Videomapp',
+        'Random': 'Slumpvis',
+        'Stop': 'Stoppa',
     },
     'da': {
         'Layer Mask': 'Lagmaske',
@@ -3071,6 +3135,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         'Developer mode': 'Udviklertilstand',
         'Install from folder…': 'Installer fra mappe…',
         'Choose a module folder': 'Vælg en modulmappe',
+        'Video folder': 'Videomappe',
+        'Random': 'Tilfældig',
+        'Stop': 'Stop',
     },
     'no': {
         'Layer Mask': 'Lagmaske',
@@ -3204,6 +3271,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         'Developer mode': 'Utviklermodus',
         'Install from folder…': 'Installer fra mappe…',
         'Choose a module folder': 'Velg en modulmappe',
+        'Video folder': 'Videomappe',
+        'Random': 'Tilfeldig',
+        'Stop': 'Stopp',
     },
     'fi': {
         'Layer Mask': 'Tasomaski',
@@ -3337,6 +3407,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         'Developer mode': 'Kehittäjätila',
         'Install from folder…': 'Asenna kansiosta…',
         'Choose a module folder': 'Valitse moduulikansio',
+        'Video folder': 'Videokansio',
+        'Random': 'Satunnainen',
+        'Stop': 'Pysäytä',
     },
     'hu': {
         'Layer Mask': 'Rétegmaszk',
@@ -3470,6 +3543,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         'Developer mode': 'Fejlesztői mód',
         'Install from folder…': 'Telepítés mappából…',
         'Choose a module folder': 'Válasszon modulmappát',
+        'Video folder': 'Videómappa',
+        'Random': 'Véletlenszerű',
+        'Stop': 'Leállítás',
     },
     'ro': {
         'Layer Mask': 'Mască strat',
@@ -3603,6 +3679,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         'Developer mode': 'Mod dezvoltator',
         'Install from folder…': 'Instalează din dosar…',
         'Choose a module folder': 'Alegeți un dosar de modul',
+        'Video folder': 'Dosar video',
+        'Random': 'Aleatoriu',
+        'Stop': 'Oprește',
     },
     'uk': {
         'Layer Mask': 'Маска шару',
@@ -3736,6 +3815,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         'Developer mode': 'Режим розробника',
         'Install from folder…': 'Встановити з теки…',
         'Choose a module folder': 'Виберіть теку модуля',
+        'Video folder': 'Тека відео',
+        'Random': 'Випадково',
+        'Stop': 'Зупинити',
     },
     'el': {
         'Layer Mask': 'Μάσκα στρώματος',
@@ -3869,6 +3951,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         'Developer mode': 'Λειτουργία προγραμματιστή',
         'Install from folder…': 'Εγκατάσταση από φάκελο…',
         'Choose a module folder': 'Επιλέξτε φάκελο λειτουργικής μονάδας',
+        'Video folder': 'Φάκελος βίντεο',
+        'Random': 'Τυχαία',
+        'Stop': 'Διακοπή',
     },
     'he': {
         'Layer Mask': 'מסכת שכבה',
@@ -4002,6 +4087,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         'Developer mode': 'מצב מפתחים',
         'Install from folder…': 'התקנה מתיקייה…',
         'Choose a module folder': 'בחרו תיקיית מודול',
+        'Video folder': 'תיקיית וידאו',
+        'Random': 'אקראי',
+        'Stop': 'עצור',
     },
     'ms': {
         'Layer Mask': 'Topeng lapisan',
@@ -4135,6 +4223,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         'Developer mode': 'Mod pembangun',
         'Install from folder…': 'Pasang daripada folder…',
         'Choose a module folder': 'Pilih folder modul',
+        'Video folder': 'Folder video',
+        'Random': 'Rawak',
+        'Stop': 'Henti',
     },
     # --- New languages (v8.3.9) ---
     'bn': {
@@ -4269,6 +4360,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         'Developer mode': 'ডেভেলপার মোড',
         'Install from folder…': 'ফোল্ডার থেকে ইনস্টল করুন…',
         'Choose a module folder': 'একটি মডিউল ফোল্ডার বেছে নিন',
+        'Video folder': 'ভিডিও ফোল্ডার',
+        'Random': 'এলোমেলো',
+        'Stop': 'থামান',
     },
     'ur': {
         'Layer Mask': 'لیئر ماسک',
@@ -4402,6 +4496,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         'Developer mode': 'ڈویلپر موڈ',
         'Install from folder…': 'فولڈر سے انسٹال کریں…',
         'Choose a module folder': 'ماڈیول فولڈر منتخب کریں',
+        'Video folder': 'ویڈیو فولڈر',
+        'Random': 'بے ترتیب',
+        'Stop': 'روکیں',
     },
     'fa': {
         'Layer Mask': 'ماسک لایه',
@@ -4535,6 +4632,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         'Developer mode': 'حالت توسعه\u200cدهنده',
         'Install from folder…': 'نصب از پوشه…',
         'Choose a module folder': 'یک پوشهٔ ماژول انتخاب کنید',
+        'Video folder': 'پوشه ویدیو',
+        'Random': 'تصادفی',
+        'Stop': 'توقف',
     },
     'tl': {
         'Layer Mask': 'Layer Mask',
@@ -4668,6 +4768,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         'Developer mode': 'Mode ng developer',
         'Install from folder…': 'I-install mula sa folder…',
         'Choose a module folder': 'Pumili ng folder ng module',
+        'Video folder': 'Folder ng video',
+        'Random': 'Random',
+        'Stop': 'Ihinto',
     },
     'ta': {
         'Layer Mask': 'லேயர் மாஸ்க்',
@@ -4801,6 +4904,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         'Developer mode': 'டெவலப்பர் பயன்முறை',
         'Install from folder…': 'கோப்புறையிலிருந்து நிறுவு…',
         'Choose a module folder': 'தொகுதி கோப்புறையைத் தேர்ந்தெடுக்கவும்',
+        'Video folder': 'வீடியோ கோப்புறை',
+        'Random': 'சீரற்ற',
+        'Stop': 'நிறுத்து',
     },
     'pa': {
         'Layer Mask': 'ਲੇਅਰ ਮਾਸਕ',
@@ -4934,6 +5040,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         'Developer mode': 'ਡਿਵੈਲਪਰ ਮੋਡ',
         'Install from folder…': 'ਫੋਲਡਰ ਤੋਂ ਇੰਸਟਾਲ ਕਰੋ…',
         'Choose a module folder': 'ਮੋਡੀਊਲ ਫੋਲਡਰ ਚੁਣੋ',
+        'Video folder': 'ਵੀਡੀਓ ਫੋਲਡਰ',
+        'Random': 'ਬੇਤਰਤੀਬ',
+        'Stop': 'ਰੋਕੋ',
     },
     'sw': {
         'Layer Mask': 'Mask ya Tabaka',
@@ -5067,6 +5176,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         'Developer mode': 'Hali ya msanidi programu',
         'Install from folder…': 'Sakinisha kutoka folda…',
         'Choose a module folder': 'Chagua folda ya moduli',
+        'Video folder': 'Folda ya video',
+        'Random': 'Nasibu',
+        'Stop': 'Simamisha',
     },
     'my': {
         'Layer Mask': 'အလွှာမျက်နှာဖုံး',
@@ -5200,6 +5312,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         'Developer mode': 'ဆော့ဖ်ဝဲရေးသူ မုဒ်',
         'Install from folder…': 'ဖိုင်တွဲမှ ထည့်သွင်းရန်…',
         'Choose a module folder': 'မော်ဂျူး ဖိုင်တွဲကို ရွေးပါ',
+        'Video folder': 'ဗီဒီယို ဖိုင်တွဲ',
+        'Random': 'ကျပန်း',
+        'Stop': 'ရပ်ရန်',
     },
 }
 

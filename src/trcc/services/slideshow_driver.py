@@ -35,7 +35,7 @@ from typing import TYPE_CHECKING
 
 from ..core.logs import per_frame
 from ..core.models import SLIDESHOW_POLL_S
-from ._send_task import BaseSendTask
+from ._send_task import BaseSendTask, shown_on_panel
 
 if TYPE_CHECKING:
     from ..app import App
@@ -62,17 +62,10 @@ class SlideshowDriver(BaseSendTask):
         self._shown: tuple[object, ...] | None = None
 
     def _panel(self) -> tuple[object, ...]:
-        """What the panel shows now: the theme, and any source over it.
-
-        The theme as ``current_theme`` -- the resolved path every ``LoadTheme``
-        persists, the same string its result reports -- so this is a settings
-        read, not a filesystem one.
-        """
-        s = self._app.settings.for_device(self._device_key)
-        frame_log.debug("SlideshowDriver._panel: %s theme=%s", self._device_key,
-                        s.current_theme)
-        return (s.current_theme, s.background_path, s.screencast_region,
-                s.media_player_uri)
+        """What the panel shows now -- :func:`shown_on_panel`, shared with the
+        video folder driver (feature: video folder playlist)."""
+        frame_log.debug("SlideshowDriver._panel: %s", self._device_key)
+        return shown_on_panel(self._app, self._device_key)
 
     def _run(self, now: float) -> float:
         """Rotate if due; return the seconds to wait before asking again.
